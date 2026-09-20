@@ -10,6 +10,7 @@ contract FormsTest is Test {
             string memory key = string.concat("[", vm.toString(i), "]");
             assertEq(Forms.form(i), vm.parseJsonString(j, string.concat(key, ".form")));
             assertEq(Forms.language(i), vm.parseJsonString(j, string.concat(key, ".language")));
+            assertEq(Forms.tradition(i), vm.parseJsonString(j, string.concat(key, ".tradition")));
         }
     }
     function test_distinct() public pure {
@@ -19,7 +20,7 @@ contract FormsTest is Test {
     }
     function test_badLangReverts() public {
         vm.expectRevert(Forms.BadLang.selector);
-        this.callForm(10);
+        this.callForm(Forms.COUNT);
     }
     function callForm(uint8 i) external pure returns (string memory) { return Forms.form(i); }
 }

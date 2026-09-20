@@ -14,14 +14,14 @@ contract WriteTest is Test {
     function setUp() public { k = Helpers.deployKoti(); }
 
     function test_everyFormMints() public {
-        for (uint8 i = 0; i < 10; i++) {
+        for (uint8 i = 0; i < Forms.COUNT; i++) {
             vm.prank(a);
             uint256 id = k.write(Forms.form(i), "Srini");
             assertEq(id, i + 1);
             (address w, uint8 lang,, string memory nm, string memory form) = k.entry(id);
             assertEq(w, a); assertEq(lang, i); assertEq(nm, "Srini"); assertEq(form, Forms.form(i));
         }
-        assertEq(k.count(), 10);
+        assertEq(k.count(), Forms.COUNT);
     }
     function test_nearMissReverts() public {
         vm.expectRevert(EternalRamaKoti.UnknownForm.selector);

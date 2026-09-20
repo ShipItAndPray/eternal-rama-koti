@@ -7,96 +7,84 @@
       "sri",
       "ra",
       "ma"
-    ]
+    ],
+    "parts": [
+      "శ్రీ",
+      "రా",
+      "మ"
+    ],
+    "tradition": "Telugu"
   },
   {
     "id": 1,
-    "language": "Hindi",
-    "form": "श्रीराम",
+    "language": "Tamil",
+    "form": "ஸ்ரீ ராம ஜெயம்",
     "romanized": [
       "sri",
-      "ra",
-      "ma"
-    ]
+      "rama",
+      "jeyam|jayam"
+    ],
+    "parts": [
+      "ஸ்ரீ",
+      " ராம",
+      " ஜெயம்"
+    ],
+    "tradition": "Tamil"
   },
   {
     "id": 2,
-    "language": "Tamil",
-    "form": "ஸ்ரீராம",
+    "language": "Hindi",
+    "form": "राम",
     "romanized": [
-      "sri",
       "ra",
-      "ma"
-    ]
+      "m"
+    ],
+    "parts": [
+      "रा",
+      "म"
+    ],
+    "tradition": "Hindi"
   },
   {
     "id": 3,
-    "language": "Kannada",
-    "form": "ಶ್ರೀರಾಮ",
-    "romanized": [
-      "sri",
-      "ra",
-      "ma"
-    ]
-  },
-  {
-    "id": 4,
-    "language": "Malayalam",
-    "form": "ശ്രീരാമ",
-    "romanized": [
-      "sri",
-      "ra",
-      "ma"
-    ]
-  },
-  {
-    "id": 5,
-    "language": "Bengali",
-    "form": "শ্রীরাম",
-    "romanized": [
-      "sri",
-      "ra",
-      "ma"
-    ]
-  },
-  {
-    "id": 6,
-    "language": "Gujarati",
-    "form": "શ્રીરામ",
-    "romanized": [
-      "sri",
-      "ra",
-      "ma"
-    ]
-  },
-  {
-    "id": 7,
-    "language": "Odia",
-    "form": "ଶ୍ରୀରାମ",
-    "romanized": [
-      "sri",
-      "ra",
-      "ma"
-    ]
-  },
-  {
-    "id": 8,
-    "language": "Punjabi",
-    "form": "ਸ਼੍ਰੀਰਾਮ",
-    "romanized": [
-      "sri",
-      "ra",
-      "ma"
-    ]
-  },
-  {
-    "id": 9,
     "language": "English",
     "form": "Sri Rama",
     "romanized": [
       "sri",
-      " ra",
-      "ma"
-    ]
+      "rama"
+    ],
+    "parts": [
+      "Sri",
+      " Rama"
+    ],
+    "tradition": "Telugu"
+  },
+  {
+    "id": 4,
+    "language": "English",
+    "form": "Sri Rama Jayam",
+    "romanized": [
+      "sri",
+      "rama",
+      "jayam|jeyam"
+    ],
+    "parts": [
+      "Sri",
+      " Rama",
+      " Jayam"
+    ],
+    "tradition": "Tamil"
+  },
+  {
+    "id": 5,
+    "language": "English",
+    "form": "Ram",
+    "romanized": [
+      "ram"
+    ],
+    "parts": [
+      "Ram"
+    ],
+    "tradition": "Hindi"
   }
 ]

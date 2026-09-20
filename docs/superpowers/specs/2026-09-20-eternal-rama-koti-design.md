@@ -25,25 +25,24 @@ after deploy. A static web page is the writing surface.
 - No mobile app, accounts, or analytics beyond the GA4 tag used on every ShipItAndPray site.
 - No adding languages after deploy. The set is fixed. A new set means a new contract.
 
-## 3. Languages
+## 3. Languages and forms
 
-Ten scripts, each with one canonical form of "Sri Rama". Exact strings are verified
-visually (rendered side by side) and confirmed by the owner before Sepolia deploy.
+Three regional writing traditions, each in its own script and in English. Six forms
+total, fixed forever at deploy. Every token records both its language and its tradition.
 
-| id | Language | Script form |
-|---|---|---|
-| 0 | Telugu | శ్రీరామ |
-| 1 | Hindi / Sanskrit / Marathi (Devanagari) | श्रीराम |
-| 2 | Tamil | ஸ்ரீராம |
-| 3 | Kannada | ಶ್ರೀರಾಮ |
-| 4 | Malayalam | ശ്രീരാമ |
-| 5 | Bengali | শ্রীরাম |
-| 6 | Gujarati | શ્રીરામ |
-| 7 | Odia | ଶ୍ରୀରାମ |
-| 8 | Punjabi (Gurmukhi) | ਸ਼੍ਰੀਰਾਮ |
-| 9 | English (Latin) | Sri Rama |
+| id | Language | Form | Tradition |
+|---|---|---|---|
+| 0 | Telugu | శ్రీరామ | Telugu (Rama Koti, Bhadrachalam) |
+| 1 | Tamil | ஸ்ரீ ராம ஜெயம் | Tamil (Sri Rama Jayam; Tamil sources spell it with ஜெ) |
+| 2 | Hindi | राम | Hindi (Ram Naam Lekhan; Ram Naam Bank, Varanasi) |
+| 3 | English | Sri Rama | Telugu |
+| 4 | English | Sri Rama Jayam | Tamil |
+| 5 | English | Ram | Hindi |
 
-The contract maps `keccak256(bytes(form))` to language id. Any other bytes revert.
+The contract maps `keccak256(bytes(form))` to form id. Any other bytes revert.
+Left out because no written-japa tradition could be sourced: Kannada, Malayalam,
+Gujarati, Bengali, Odia, Punjabi. The Marathi and Kannada 13-syllable mantra is left
+out because it contains Rama three times, which breaks the one-transaction-one-name rule.
 
 ## 4. Contract: `EternalRamaKoti.sol`
 
@@ -52,7 +51,7 @@ encoder lives in `src/lib/`.
 
 ### Constants
 
-`KOTI = 10_000_000`. `MAX_NAME_BYTES = 31`.
+`KOTI = 10_000_000`. `MAX_NAME_BYTES = 31`. `LANG_COUNT = Forms.COUNT = 6`.
 
 ### State
 
@@ -122,6 +121,7 @@ The owner can flip this before mainnet; it is a one-line change and a test chang
   "image": "data:image/svg+xml;base64,...",
   "attributes": [
     {"trait_type":"Language","value":"Telugu"},
+    {"trait_type":"Tradition","value":"Telugu"},
     {"trait_type":"Written by","value":"<name>"},
     {"trait_type":"Index","display_type":"number","value":12345},
     {"trait_type":"Koti","display_type":"number","value":1},
