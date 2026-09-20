@@ -9,3 +9,7 @@ jobs:
       - run: forge --version
       - run: forge build --sizes
       - run: forge test -vv
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test web/

@@ -61,24 +61,20 @@ section + section { margin-top: var(--line); }
 .progress { height: 4px; margin: 6px 0 22px; background: rgba(31, 42, 68, .12); overflow: hidden; }
 .progress span { display: block; height: 100%; width: 0; background: var(--ink); transition: width .6s ease; }
 
-.langs { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 8px 0 0; }
-.lang {
-  font: inherit; color: var(--pen); background: transparent; border: 0; cursor: pointer;
-  padding: 0 4px; height: var(--line); display: inline-flex; align-items: center; gap: 8px;
-  border-bottom: 2px solid transparent;
+select {
+  font: inherit; color: var(--pen); background: transparent; border: 0; border-bottom: 2px solid var(--margin);
+  height: var(--line); padding: 0 28px 0 0; margin: 0; border-radius: 0; width: 100%; max-width: 520px; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%231F2A44' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 4px center;
 }
-.lang .glyph { height: 22px; width: auto; }
-.lang .glyph path { fill: var(--pen); }
-.lang[aria-checked="true"] { border-bottom-color: var(--margin); }
-.lang[aria-checked="true"] .glyph path { fill: var(--ink); }
-.lang small { font-size: 15px; color: var(--muted); }
-.variants { margin-top: 2px; }
-.variant { font: inherit; color: var(--pen); background: transparent; border: 0; cursor: pointer; padding: 0 4px; height: var(--line); display: inline-flex; align-items: center; gap: 8px; border-bottom: 2px solid transparent; }
-.variant .glyph { height: 18px; width: auto; }
-.variant .glyph path { fill: var(--pen); }
-.variant[aria-checked="true"] { border-bottom-color: var(--margin); }
-.variant[aria-checked="true"] .glyph path { fill: var(--ink); }
-.variant small { font-size: 14px; color: var(--muted); }
+select:focus-visible { outline: none; border-bottom-color: var(--ink); }
+.label { display: block; color: var(--muted); }
+.write-grid { display: grid; grid-template-columns: minmax(0, 1fr) 224px; gap: 0 28px; align-items: start; }
+.preview { margin-top: var(--line); }
+.preview .label { font-size: 16px; line-height: 26px; margin-bottom: 6px; }
+.card svg { display: block; width: 100%; height: auto; box-shadow: 0 8px 22px rgba(0, 0, 0, .18); }
+@media (max-width: 700px) { .write-grid { grid-template-columns: 1fr; } .card { max-width: 260px; } }
 
 .line { margin-top: var(--line); }
 .line label { display: block; color: var(--muted); }

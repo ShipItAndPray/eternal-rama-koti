@@ -28,12 +28,16 @@
 
   <section class="write">
     <h2>Write one name</h2>
-
-    <div class="langs" id="langs" role="radiogroup" aria-label="Language"></div>
-    <div class="langs variants" id="variants" role="radiogroup" aria-label="Which form" hidden></div>
+    <div class="write-grid">
+    <div class="fields">
+    <div class="line">
+      <label for="form">Language</label>
+      <select id="form" aria-describedby="formhelp"></select>
+      <p class="help" id="formhelp"></p>
+    </div>
 
     <div class="line">
-      <label for="rama">Type <span id="romhint" class="rom">srirama</span>, or write the word itself</label>
+      <label for="rama">Type <span id="romhint" class="rom">srirama</span> and it appears below, or type the word itself</label>
       <div class="ink" id="ink" aria-live="polite"></div>
       <input id="rama" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="typehelp">
       <p class="help" id="typehelp"></p>
@@ -43,6 +47,12 @@
       <label for="name">Your name, in English letters</label>
       <input id="name" maxlength="31" autocomplete="off" spellcheck="false" placeholder="Srinivasa" aria-describedby="namemeta">
       <p class="help" id="namemeta">0 of 31</p>
+    </div>
+    </div>
+    <div class="preview">
+      <span class="label">Your card, as it will be kept on Ethereum</span>
+      <div id="card" class="card"></div>
+    </div>
     </div>
 
     <p class="cost" id="cost">Checking the cost of one name.</p>

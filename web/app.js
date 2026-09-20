@@ -3,6 +3,7 @@ import {
 } from "https://cdn.jsdelivr.net/npm/viem@2/+esm";
 import { CHAIN } from "./config.js";
 import { FORMS, PATHS } from "./glyphs.js";
+import { matchTyping, hintFor } from "./typing.js";
 
 const ABI = parseAbi([
   "function count() view returns (uint256)",
@@ -26,7 +27,7 @@ const chain = {
 const pub = createPublicClient({ chain, transport: fallback(CHAIN.rpcs.map((u) => http(u))) });
 
 const $ = (id) => document.getElementById(id);
-const state = { lang: 0, complete: false, name: "", provider: null, account: null, busy: false, full: false };
+const state = { lang: 0, complete: false, name: "", provider: null, account: null, busy: false, full: false, nextIndex: 1n };
 const NAME_RE = /^[A-Za-z .-]{1,31}$/;
 
 // ---------- formatting ----------
@@ -39,6 +40,21 @@ function indian(n) {
   while (rest.length > 2) { groups.unshift(rest.slice(-2)); rest = rest.slice(0, -2); }
   if (rest) groups.unshift(rest);
   return groups.join(",") + "," + last;
+}
+// Mirrors Renderer.svg in the contract exactly: same box, colors, positions.
+function cardSvg(id, name, idx) {
+  const nm = name ? esc(name) : "Your name";
+  const nmFill = name ? "#3A2A1A" : "rgba(58,42,26,.35)";
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-label="Preview of your card">
+<rect width="600" height="800" fill="#FBF3E4"/>
+<rect x="24" y="24" width="552" height="752" fill="none" stroke="#E0891F" stroke-width="4"/>
+<svg x="50" y="200" width="500" height="200" viewBox="0 0 1000 400"><path d="${PATHS[id]}" fill="#9B1C1C"/></svg>
+<text x="300" y="560" text-anchor="middle" font-family="serif" font-size="34" fill="${nmFill}">${nm}</text>
+<text x="300" y="620" text-anchor="middle" font-family="serif" font-size="26" fill="#7A5A3A">#${indian(idx)} of 1,00,00,000</text>
+</svg>`;
+}
+function renderCard() {
+  $("card").innerHTML = cardSvg(state.lang, NAME_RE.test(state.name.trim()) ? state.name.trim() : "", state.nextIndex);
 }
 function glyph(id, h, tight = false) {
   const f = FORMS[id];
@@ -57,66 +73,40 @@ function short(a) { return a.slice(0, 6) + "…" + a.slice(-4); }
 function status(msg, bad = false) { const el = $("status"); el.textContent = msg; el.style.color = bad ? "var(--ink)" : ""; }
 
 // ---------- language picker ----------
-const LANGS = [...new Set(FORMS.map((f) => f.language))];
-function formsOf(lang) { return FORMS.filter((f) => f.language === lang); }
-function renderLangs() {
-  const box = $("langs");
-  box.innerHTML = LANGS.map((l) => {
-    const f = formsOf(l)[0];
-    return `<button type="button" class="lang" role="radio" aria-checked="false" data-lang="${esc(l)}" title="${esc(f.form)}">${glyph(f.id, 20, true)}<small>${esc(l)}</small></button>`;
-  }).join("");
-  box.querySelectorAll(".lang").forEach((b) => b.addEventListener("click", () => selectLanguage(b.dataset.lang)));
+function optionLabel(f) {
+  const same = FORMS.filter((x) => x.language === f.language).length > 1;
+  return same ? `${f.form} (${f.language}, ${f.tradition} tradition)` : `${f.form} (${f.language})`;
 }
-function selectLanguage(lang) {
-  document.querySelectorAll(".lang").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.lang === lang)));
-  const fs = formsOf(lang);
-  const row = $("variants");
-  if (fs.length > 1) {
-    row.hidden = false;
-    row.innerHTML = fs.map((f) =>
-      `<button type="button" class="variant" role="radio" aria-checked="false" data-id="${f.id}">${glyph(f.id, 16, true)}<small>${esc(f.tradition)} tradition</small></button>`
-    ).join("");
-    row.querySelectorAll(".variant").forEach((b) => b.addEventListener("click", () => selectForm(Number(b.dataset.id))));
-  } else { row.hidden = true; row.innerHTML = ""; }
-  selectForm(fs[0].id);
+function renderLangs() {
+  const sel = $("form");
+  sel.innerHTML = FORMS.map((f) => `<option value="${f.id}">${esc(optionLabel(f))}</option>`).join("");
+  sel.addEventListener("change", () => selectForm(Number(sel.value)));
 }
 function selectForm(id) {
   state.lang = id;
-  document.querySelectorAll(".variant").forEach((b) => b.setAttribute("aria-checked", String(Number(b.dataset.id) === id)));
-  $("romhint").textContent = FORMS[id].romanized.map((r) => r.split("|")[0]).join("");
+  const f = FORMS[id];
+  $("form").value = String(id);
+  $("formhelp").textContent = f.language === "English" ? `The ${f.tradition} form, written in English letters.` : `The ${f.tradition} tradition, in ${f.language} script.`;
+  $("romhint").textContent = hintFor(f);
   $("rama").value = "";
   onType();
-  $("rama").focus({ preventScroll: true });
+  renderCard();
 }
 
 // ---------- typing the name of Rama ----------
 function onType() {
   const f = FORMS[state.lang];
   const raw = $("rama").value;
-  const norm = raw.toLowerCase().replace(/\s+/g, "");
-  // walk the syllables, allowing alternate spellings like "jeyam|jayam"
-  let matched = 0, acc = "", onTrack = true;
-  for (const syl of f.romanized) {
-    const alts = syl.split("|");
-    const hit = alts.find((a) => norm.startsWith(acc + a));
-    if (hit) { acc += hit; matched++; continue; }
-    const rest = norm.slice(acc.length);
-    onTrack = alts.some((a) => a.startsWith(rest));
-    break;
-  }
-  const complete = raw === f.form || (matched === f.romanized.length && norm === acc);
-  if (matched === f.romanized.length && norm !== acc) onTrack = false;
-  if (!complete && f.form.startsWith(raw) && raw !== "") onTrack = true;
+  const { complete, onTrack, partial } = matchTyping(f, raw);
   state.complete = complete;
   const ink = $("ink");
   if (complete) ink.innerHTML = glyph(f.id, 52);
-  else ink.textContent = f.parts.slice(0, matched).join("");
+  else ink.textContent = partial;
   const help = $("typehelp");
-  const hint = f.romanized.map((r) => r.split("|")[0]).join("");
   if (raw === "") { help.textContent = ""; help.className = "help"; }
   else if (complete) { help.textContent = "Written. Now add your name."; help.className = "help"; }
   else if (onTrack) { help.textContent = "Keep going."; help.className = "help"; }
-  else { help.textContent = `Only the letters of ${hint}, in order.`; help.className = "help bad"; }
+  else { help.textContent = `Only the letters of ${hintFor(f)}, in order.`; help.className = "help bad"; }
   updateOffer();
 }
 function onName() {
@@ -127,6 +117,7 @@ function onName() {
   if (v === "") { meta.textContent = "0 of 31"; meta.className = "help"; }
   else if (!NAME_RE.test(v)) { meta.textContent = "English letters, spaces, periods and hyphens only."; meta.className = "help bad"; }
   else { meta.textContent = `${bytes} of 31`; meta.className = "help"; }
+  renderCard();
   updateOffer();
 }
 function block(e) { e.preventDefault(); status("Please type it. Pasting is not writing.", true); }
@@ -233,6 +224,8 @@ async function refreshCounts() {
   );
   $("count").textContent = indian(count);
   $("writers").textContent = indian(writers);
+  state.nextIndex = count + 1n;
+  renderCard();
   state.full = count >= KOTI;
   $("koti").textContent = state.full ? ". The book is complete." : "";
   $("bar").style.width = `${Number(count * 10000n / KOTI) / 100}%`;
@@ -288,7 +281,7 @@ async function loadRecent() {
 
 // ---------- boot ----------
 renderLangs();
-selectLanguage(LANGS[0]);
+selectForm(0);
 onName();
 if (CHAIN.koti) {
   $("contract-link").href = `${CHAIN.explorer}/address/${CHAIN.koti}`;
