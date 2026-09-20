@@ -27,7 +27,7 @@ const chain = {
 const pub = createPublicClient({ chain, transport: fallback(CHAIN.rpcs.map((u) => http(u))) });
 
 const $ = (id) => document.getElementById(id);
-const state = { lang: 0, complete: false, name: "", provider: null, account: null, busy: false, full: false, nextIndex: 1n };
+const state = { lang: 0, complete: false, name: "", provider: null, account: null, busy: false, full: false, nextIndex: 1n, partial: "" };
 const NAME_RE = /^[A-Za-z .-]{1,31}$/;
 
 // ---------- formatting ----------
@@ -41,20 +41,25 @@ function indian(n) {
   if (rest) groups.unshift(rest);
   return groups.join(",") + "," + last;
 }
-// Mirrors Renderer.svg in the contract exactly: same box, colors, positions.
-function cardSvg(id, name, idx) {
+// Mirrors Renderer.svg in the contract: same box, colors, positions. While the devotee is still
+// typing, the word area shows what they have typed so far; once complete it shows the on-chain outline.
+function cardSvg(id, partial, complete, name, idx) {
   const nm = name ? esc(name) : "Your name";
   const nmFill = name ? "#3A2A1A" : "rgba(58,42,26,.35)";
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-label="Preview of your card">
+  const word = complete
+    ? `<svg x="50" y="200" width="500" height="200" viewBox="0 0 1000 400"><path d="${PATHS[id]}" fill="#9B1C1C"/></svg>`
+    : `<text x="300" y="325" text-anchor="middle" font-family="serif" font-size="${partial.length > 8 ? 56 : 84}" fill="#9B1C1C">${esc(partial)}</text>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-label="Your NFT as you write it">
 <rect width="600" height="800" fill="#FBF3E4"/>
 <rect x="24" y="24" width="552" height="752" fill="none" stroke="#E0891F" stroke-width="4"/>
-<svg x="50" y="200" width="500" height="200" viewBox="0 0 1000 400"><path d="${PATHS[id]}" fill="#9B1C1C"/></svg>
+${word}
 <text x="300" y="560" text-anchor="middle" font-family="serif" font-size="34" fill="${nmFill}">${nm}</text>
 <text x="300" y="620" text-anchor="middle" font-family="serif" font-size="26" fill="#7A5A3A">#${indian(idx)} of 1,00,00,000</text>
 </svg>`;
 }
 function renderCard() {
-  $("card").innerHTML = cardSvg(state.lang, NAME_RE.test(state.name.trim()) ? state.name.trim() : "", state.nextIndex);
+  const name = NAME_RE.test(state.name.trim()) ? state.name.trim() : "";
+  $("card").innerHTML = cardSvg(state.lang, state.partial || "", state.complete, name, state.nextIndex);
 }
 function glyph(id, h, tight = false) {
   const f = FORMS[id];
@@ -99,6 +104,8 @@ function onType() {
   const raw = $("rama").value;
   const { complete, onTrack, partial } = matchTyping(f, raw);
   state.complete = complete;
+  state.partial = partial;
+  renderCard();
   const ink = $("ink");
   if (complete) ink.innerHTML = glyph(f.id, 52);
   else ink.textContent = partial;

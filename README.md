@@ -14,6 +14,9 @@ Every token is fully on-chain: the script, the devotee's name, the writer's addr
 the timestamp, and the sequence number live in the contract, and the image is an SVG
 the contract draws itself, with no fonts and no external references.
 
+Once written, a name can never be changed or removed. When the book reaches one crore, it
+will be printed and taken to the Ram Mandir.
+
 Nothing can be paused, edited, upgraded, or owned. There is no backend. The page is
 static and talks to the chain through public RPC and the devotee's own wallet.
 

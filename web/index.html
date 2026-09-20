@@ -23,7 +23,8 @@
   <section class="ledger" aria-live="polite">
     <p class="tally"><span id="count">…</span> of 1,00,00,000 names written<span id="koti"></span></p>
     <div class="progress" role="progressbar" aria-label="Progress toward one crore" aria-valuemin="0" aria-valuemax="10000000" aria-valuenow="0"><span id="bar"></span></div>
-    <p class="tally-sub"><span id="writers">…</span> people have written so far. Each name is one transaction, kept by Ethereum for as long as Ethereum exists.</p>
+    <p class="tally-sub"><span id="writers">…</span> people have written so far. Each name is one transaction and one NFT, minted to the address that wrote it, kept by Ethereum for as long as Ethereum exists.</p>
+    <p class="tally-sub">Once written, a name can never be changed or removed. When the book reaches one crore, it is printed and taken to the Ram Mandir.</p>
   </section>
 
   <section class="write">
@@ -50,7 +51,7 @@
     </div>
     </div>
     <div class="preview">
-      <span class="label">Your card, as it will be kept on Ethereum</span>
+      <span class="label">Your NFT, minted to your address. It takes shape as you type.</span>
       <div id="card" class="card"></div>
     </div>
     </div>
@@ -72,7 +73,7 @@
 </main>
 
 <footer class="cover foot">
-  <p>The book has no owner, no admin, and no server. The contract cannot be paused, edited, or taken down by anyone. Every name you write is minted to you as a token that lives entirely on Ethereum, image included.</p>
+  <p>The book has no owner, no admin, and no server. The contract cannot be paused, edited, or taken down by anyone. Every name you write is minted to your address as an NFT that lives entirely on Ethereum, image included.</p>
   <p><a id="contract-link" href="#">Contract on the explorer</a> <span class="sep">and</span> <a href="https://github.com/ShipItAndPray/eternal-rama-koti">source on GitHub</a>.</p>
 </footer>
 
