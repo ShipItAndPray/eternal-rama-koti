@@ -1,0 +1,15 @@
+{
+  "sepolia": {
+    "chainId": 11155111,
+    "koti": "0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef",
+    "glyphs": [
+      "0x3dab372102b96551e22ea6e85d1e4c8fccb94f24",
+      "0x73f21d21a7dfde6b6bbf8bb997245adf87a7898b",
+      "0xfc6c0fa225634acf030d42a5881f153f39aabd80",
+      "0x11e37473da4ce21cdf58ec17d91683f28d283542",
+      "0xc7e739d2a3a4925b18af70c5eff8d45653a9c28d",
+      "0x2212b9a38a1afb63516c08697d1c303fb3180019"
+    ],
+    "deployBlock": 11746350
+  }
+}

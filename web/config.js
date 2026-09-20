@@ -10,6 +10,6 @@ export const CHAIN = {
     "https://eth-sepolia.blockscout.com/api/eth-rpc",
   ],
   explorer: "https://sepolia.etherscan.io",
-  koti: null,        // contract address, set after deploy
-  deployBlock: 0,    // block the contract was deployed in
+  koti: "0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef",
+  deployBlock: 11746350,
 };

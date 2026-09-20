@@ -2,7 +2,7 @@
 
 **One transaction writes one name of Rama on Ethereum. Forever.**
 
-Live page: https://shipitandpray.github.io/eternal-rama-koti/ (the book opens once the Sepolia contract is deployed)
+Live page: https://shipitandpray.github.io/eternal-rama-koti/ (Sepolia test network)
 
 A shared Rama Koti. A devotee picks a language, types the name of Rama in that script,
 adds their own name, and sends one transaction. The contract checks the typed bytes
@@ -34,7 +34,7 @@ The contract accepts exactly these byte sequences and nothing else.
 
 | Network | Contract | Deployed |
 |---|---|---|
-| Sepolia | _pending_ | |
+| Sepolia | [`0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef`](https://sepolia.etherscan.io/address/0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef) | 2026-09-20, block 11746350 |
 
 Mainnet is a separate decision, not yet made.
 
@@ -43,7 +43,7 @@ Mainnet is a separate decision, not yet made.
 The page is a convenience. The contract is the truth. From Foundry's `cast`:
 
 ```bash
-cast send <contract> "write(string,string)" "శ్రీరామ" "Your Name" \
+cast send 0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef "write(string,string)" "శ్రీరామ" "Your Name" \
   --rpc-url https://ethereum-sepolia-rpc.publicnode.com --private-key <key>
 ```
 
@@ -53,8 +53,8 @@ Or use the explorer's Write Contract tab with `write(rama, writerName)`. The nam
 Read the book:
 
 ```bash
-cast call <contract> "count()(uint256)" --rpc-url https://ethereum-sepolia-rpc.publicnode.com
-cast call <contract> "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
+cast call 0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef "count()(uint256)" --rpc-url https://ethereum-sepolia-rpc.publicnode.com
+cast call 0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
 ```
 
 ## Gas
