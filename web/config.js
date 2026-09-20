@@ -6,8 +6,8 @@ export const CHAIN = {
   nativeCurrency: { name: "Sepolia Ether", symbol: "ETH", decimals: 18 },
   rpcs: [
     "https://ethereum-sepolia-rpc.publicnode.com",
-    "https://1rpc.io/sepolia",
-    "https://sepolia.drpc.org",
+    "https://sepolia.gateway.tenderly.co",
+    "https://eth-sepolia.blockscout.com/api/eth-rpc",
   ],
   explorer: "https://sepolia.etherscan.io",
   koti: null,        // contract address, set after deploy
