@@ -1,1 +1,7 @@
+out/
+cache/
+broadcast/
+.env
 .venv/
+tools/fonts/*.ttf
+node_modules/
