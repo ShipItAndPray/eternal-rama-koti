@@ -5,7 +5,7 @@ import {Base64} from "./lib/Base64.sol";
 library Renderer {
     function u(uint256 v) internal pure returns (string memory) {
         if (v == 0) return "0";
-        uint256 t = v; uint256 n;
+        uint256 t = v; uint256 n = 0;
         while (t != 0) { n++; t /= 10; }
         bytes memory b = new bytes(n);
         while (v != 0) { b[--n] = bytes1(uint8(48 + v % 10)); v /= 10; }

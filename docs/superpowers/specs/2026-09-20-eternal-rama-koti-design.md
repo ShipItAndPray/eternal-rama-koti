@@ -158,7 +158,7 @@ Hosted on GitHub Pages.
 
 ### Reads, no wallet
 
-- `count`, `writers`, `kotisCompleted` via `eth_call` on keyless RPCs. Sepolia:
+- `count`, `writers`, `complete` via `eth_call` on keyless RPCs. Sepolia:
   PublicNode Sepolia primary, with two fallbacks. Mainnet list ready in config.
 - Recent entries: last 24 `Written` events via Blockscout's keyless API for the
   active chain, each rendered by fetching `tokenURI` and inlining the SVG.

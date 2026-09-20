@@ -8,6 +8,7 @@ library Base64 {
     function encode(bytes memory data) internal pure returns (string memory) {
         if (data.length == 0) return "";
         string memory table = TABLE;
+        // forge-lint: disable-next-line(divide-before-multiply)
         string memory result = new string(4 * ((data.length + 2) / 3));
         assembly {
             let tablePtr := add(table, 1)
