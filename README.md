@@ -37,7 +37,7 @@ The contract accepts exactly these byte sequences and nothing else.
 
 | Network | Contract | Deployed |
 |---|---|---|
-| Sepolia | [`0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e`](https://sepolia.etherscan.io/address/0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e) | 2026-09-20, block 11746488 (v2; v1 at `0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef` is retired) |
+| Sepolia | [`0x1d47d28174a6c0d2876415894da9ddd6c4f7a952`](https://sepolia.etherscan.io/address/0x1d47d28174a6c0d2876415894da9ddd6c4f7a952) | 2026-09-20, block 11746594 (v3 after the security review; v1 `0x3d23…02ef` and v2 `0x32e2…356e` are retired) |
 
 Mainnet is a separate decision, not yet made.
 
@@ -46,7 +46,7 @@ Mainnet is a separate decision, not yet made.
 The page is a convenience. The contract is the truth. From Foundry's `cast`:
 
 ```bash
-cast send 0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e "write(string,string)" "శ్రీరామ" "Your Name" \
+cast send 0x1d47d28174a6c0d2876415894da9ddd6c4f7a952 "write(string,string)" "శ్రీరామ" "Your Name" \
   --rpc-url https://ethereum-sepolia-rpc.publicnode.com --private-key <key>
 ```
 
@@ -56,8 +56,8 @@ Or use the explorer's Write Contract tab with `write(rama, writerName)`. The nam
 Read the book:
 
 ```bash
-cast call 0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e "count()(uint256)" --rpc-url https://ethereum-sepolia-rpc.publicnode.com
-cast call 0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
+cast call 0x1d47d28174a6c0d2876415894da9ddd6c4f7a952 "count()(uint256)" --rpc-url https://ethereum-sepolia-rpc.publicnode.com
+cast call 0x1d47d28174a6c0d2876415894da9ddd6c4f7a952 "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
 ```
 
 ## Gas
