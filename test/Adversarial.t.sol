@@ -133,6 +133,13 @@ contract AdversarialTest is Test {
         vm.expectRevert(EternalRamaKoti.BadGlyph.selector);
         new EternalRamaKoti(g);
     }
+    function test_constructorRejectsSwappedGlyphs() public {
+        address[6] memory g;
+        for (uint8 i; i < 6; i++) g[i] = k.glyphs(i);
+        (g[1], g[2]) = (g[2], g[1]);              // valid data contracts, wrong slots
+        vm.expectRevert(EternalRamaKoti.BadGlyph.selector);
+        new EternalRamaKoti(g);
+    }
     function test_glyphGetterMatchesData() public view {
         for (uint8 i; i < 6; i++) {
             bytes memory d = bytes(vm.readFile(string.concat("glyphs/", vm.toString(i), ".txt")));

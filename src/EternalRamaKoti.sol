@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 import {Forms} from "./Forms.sol";
 import {Renderer} from "./Renderer.sol";
 import {DataStore} from "./lib/DataStore.sol";
+import {GlyphHashes} from "./GlyphHashes.sol";
 import {Base64} from "./lib/Base64.sol";
 
 /// Eternal Rama Koti. One transaction writes one name of Rama. The book holds exactly one crore.
@@ -42,7 +43,7 @@ contract EternalRamaKoti {
 
     constructor(address[6] memory glyphs) {
         assert(LANG_COUNT == Forms.COUNT);
-        for (uint256 i = 0; i < 6; i++) {
+        for (uint8 i = 0; i < 6; i++) {
             address g = glyphs[i];
             uint256 size;
             assembly { size := extcodesize(g) }
@@ -50,6 +51,7 @@ contract EternalRamaKoti {
             bytes memory first = new bytes(1);
             assembly { extcodecopy(g, add(first, 32), 0, 1) }
             if (first[0] != 0x00) revert BadGlyph(); // must be a STOP-prefixed data contract, not a delegation or code
+            if (keccak256(DataStore.get(g)) != GlyphHashes.hash(i)) revert BadGlyph(); // and hold exactly the committed outline
         }
         _glyphs = glyphs;
         for (uint8 i = 0; i < LANG_COUNT; i++) _langPlusOne[keccak256(bytes(Forms.form(i)))] = i + 1;
