@@ -1,0 +1,102 @@
+[
+  {
+    "id": 0,
+    "language": "Telugu",
+    "form": "శ్రీరామ",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 1,
+    "language": "Hindi",
+    "form": "श्रीराम",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 2,
+    "language": "Tamil",
+    "form": "ஸ்ரீராம",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 3,
+    "language": "Kannada",
+    "form": "ಶ್ರೀರಾಮ",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 4,
+    "language": "Malayalam",
+    "form": "ശ്രീരാമ",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 5,
+    "language": "Bengali",
+    "form": "শ্রীরাম",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 6,
+    "language": "Gujarati",
+    "form": "શ્રીરામ",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 7,
+    "language": "Odia",
+    "form": "ଶ୍ରୀରାମ",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 8,
+    "language": "Punjabi",
+    "form": "ਸ਼੍ਰੀਰਾਮ",
+    "romanized": [
+      "sri",
+      "ra",
+      "ma"
+    ]
+  },
+  {
+    "id": 9,
+    "language": "English",
+    "form": "Sri Rama",
+    "romanized": [
+      "sri",
+      " ra",
+      "ma"
+    ]
+  }
+]
