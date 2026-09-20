@@ -55,20 +55,36 @@ function short(a) { return a.slice(0, 6) + "…" + a.slice(-4); }
 function status(msg, bad = false) { const el = $("status"); el.textContent = msg; el.style.color = bad ? "var(--ink)" : ""; }
 
 // ---------- language picker ----------
+const LANGS = [...new Set(FORMS.map((f) => f.language))];
+function formsOf(lang) { return FORMS.filter((f) => f.language === lang); }
 function renderLangs() {
   const box = $("langs");
-  box.innerHTML = FORMS.map((f) =>
-    `<button type="button" class="lang" role="radio" aria-checked="${f.id === state.lang}" data-id="${f.id}" title="${esc(f.form)}">${glyph(f.id, 22)}<small>${esc(f.language)}</small></button>`
-  ).join("");
-  box.querySelectorAll(".lang").forEach((b) => b.addEventListener("click", () => selectLang(Number(b.dataset.id))));
+  box.innerHTML = LANGS.map((l) => {
+    const f = formsOf(l)[0];
+    return `<button type="button" class="lang" role="radio" aria-checked="false" data-lang="${esc(l)}" title="${esc(f.form)}">${glyph(f.id, 22)}<small>${esc(l)}</small></button>`;
+  }).join("");
+  box.querySelectorAll(".lang").forEach((b) => b.addEventListener("click", () => selectLanguage(b.dataset.lang)));
 }
-function selectLang(id) {
+function selectLanguage(lang) {
+  document.querySelectorAll(".lang").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.lang === lang)));
+  const fs = formsOf(lang);
+  const row = $("variants");
+  if (fs.length > 1) {
+    row.hidden = false;
+    row.innerHTML = fs.map((f) =>
+      `<button type="button" class="variant" role="radio" aria-checked="false" data-id="${f.id}">${glyph(f.id, 18)}<small>${esc(f.tradition)} tradition</small></button>`
+    ).join("");
+    row.querySelectorAll(".variant").forEach((b) => b.addEventListener("click", () => selectForm(Number(b.dataset.id))));
+  } else { row.hidden = true; row.innerHTML = ""; }
+  selectForm(fs[0].id);
+}
+function selectForm(id) {
   state.lang = id;
-  document.querySelectorAll(".lang").forEach((b) => b.setAttribute("aria-checked", String(Number(b.dataset.id) === id)));
-  $("romhint").textContent = FORMS[id].romanized.join("").replace(/\s+/g, "");
+  document.querySelectorAll(".variant").forEach((b) => b.setAttribute("aria-checked", String(Number(b.dataset.id) === id)));
+  $("romhint").textContent = FORMS[id].romanized.map((r) => r.split("|")[0]).join("");
   $("rama").value = "";
   onType();
-  $("rama").focus();
+  $("rama").focus({ preventScroll: true });
 }
 
 // ---------- typing the name of Rama ----------
@@ -76,23 +92,29 @@ function onType() {
   const f = FORMS[state.lang];
   const raw = $("rama").value;
   const norm = raw.toLowerCase().replace(/\s+/g, "");
-  const romKey = f.romanized.join("").replace(/\s+/g, "");
-  let matched = 0, acc = "";
+  // walk the syllables, allowing alternate spellings like "jeyam|jayam"
+  let matched = 0, acc = "", onTrack = true;
   for (const syl of f.romanized) {
-    acc += syl.replace(/\s+/g, "");
-    if (norm.startsWith(acc)) matched++; else break;
+    const alts = syl.split("|");
+    const hit = alts.find((a) => norm.startsWith(acc + a));
+    if (hit) { acc += hit; matched++; continue; }
+    const rest = norm.slice(acc.length);
+    onTrack = alts.some((a) => a.startsWith(rest));
+    break;
   }
-  const complete = raw === f.form || norm === romKey;
-  const onTrack = complete || romKey.startsWith(norm) || f.form.startsWith(raw);
+  const complete = raw === f.form || (matched === f.romanized.length && norm === acc);
+  if (matched === f.romanized.length && norm !== acc) onTrack = false;
+  if (!complete && f.form.startsWith(raw) && raw !== "") onTrack = true;
   state.complete = complete;
   const ink = $("ink");
   if (complete) ink.innerHTML = glyph(f.id, 52);
   else ink.textContent = f.parts.slice(0, matched).join("");
   const help = $("typehelp");
+  const hint = f.romanized.map((r) => r.split("|")[0]).join("");
   if (raw === "") { help.textContent = ""; help.className = "help"; }
   else if (complete) { help.textContent = "Written. Now add your name."; help.className = "help"; }
   else if (onTrack) { help.textContent = "Keep going."; help.className = "help"; }
-  else { help.textContent = `Only the letters of ${romKey}, in order.`; help.className = "help bad"; }
+  else { help.textContent = `Only the letters of ${hint}, in order.`; help.className = "help bad"; }
   updateOffer();
 }
 function onName() {
@@ -262,7 +284,7 @@ async function loadRecent() {
 
 // ---------- boot ----------
 renderLangs();
-selectLang(0);
+selectLanguage(LANGS[0]);
 onName();
 if (CHAIN.koti) {
   $("contract-link").href = `${CHAIN.explorer}/address/${CHAIN.koti}`;

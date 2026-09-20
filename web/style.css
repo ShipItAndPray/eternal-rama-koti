@@ -72,6 +72,13 @@ section + section { margin-top: var(--line); }
 .lang[aria-checked="true"] { border-bottom-color: var(--margin); }
 .lang[aria-checked="true"] .glyph path { fill: var(--ink); }
 .lang small { font-size: 15px; color: var(--muted); }
+.variants { margin-top: 2px; }
+.variant { font: inherit; color: var(--pen); background: transparent; border: 0; cursor: pointer; padding: 0 4px; height: var(--line); display: inline-flex; align-items: center; gap: 8px; border-bottom: 2px solid transparent; }
+.variant .glyph { height: 18px; width: auto; }
+.variant .glyph path { fill: var(--pen); }
+.variant[aria-checked="true"] { border-bottom-color: var(--margin); }
+.variant[aria-checked="true"] .glyph path { fill: var(--ink); }
+.variant small { font-size: 14px; color: var(--muted); }
 
 .line { margin-top: var(--line); }
 .line label { display: block; color: var(--muted); }
