@@ -7,8 +7,8 @@ Live page: _coming after the Sepolia deployment_
 A shared Rama Koti. A devotee picks a language, types the name of Rama in that script,
 adds their own name, and sends one transaction. The contract checks the typed bytes
 against the canonical form, mints one soulbound token to the devotee, and adds one to
-a global count. One crore (1,00,00,000) writes completes a koti, and the count keeps
-going into the next koti.
+a global count. The book holds exactly one crore (1,00,00,000) names. When the count
+reaches one crore, the contract refuses further writes and the book is complete.
 
 Every token is fully on-chain: the script, the devotee's name, the writer's address,
 the timestamp, and the sequence number live in the contract, and the image is an SVG
