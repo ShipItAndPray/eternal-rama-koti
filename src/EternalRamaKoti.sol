@@ -8,7 +8,7 @@ import {Base64} from "./lib/Base64.sol";
 /// Eternal Rama Koti. One transaction writes one name of Rama. No owner. No admin. Forever.
 contract EternalRamaKoti {
     uint256 public constant KOTI = 10_000_000;
-    uint256 public constant MAX_NAME_BYTES = 31;
+    uint256 public constant MAX_NAME_BYTES = 31; // English letters, space, period, hyphen only
     uint8 public constant LANG_COUNT = 10;
 
     struct Entry { address writer; uint8 lang; uint40 timestamp; uint8 nameLen; bytes32 name; }
@@ -59,7 +59,8 @@ contract EternalRamaKoti {
         if (b.length == 0 || b.length > MAX_NAME_BYTES) revert BadName();
         for (uint256 i = 0; i < b.length; i++) {
             uint8 c = uint8(b[i]);
-            if (c < 0x20 || c == 0x7F || c == 0x3C || c == 0x3E || c == 0x26 || c == 0x22 || c == 0x27 || c == 0x5C || c == 0x60) revert BadName();
+            bool ok = c == 0x20 || c == 0x2D || c == 0x2E || (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A);
+            if (!ok) revert BadName();
         }
         len = uint8(b.length);
         assembly { packed := calldataload(b.offset) }

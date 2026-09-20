@@ -50,9 +50,13 @@ contract WriteTest is Test {
         _bad(""); _bad(string(long));
         _bad("a<b"); _bad("a>b"); _bad("a&b"); _bad("a\"b"); _bad("a'b"); _bad("a`b"); _bad("a\\b");
         _bad("a\nb"); _bad(string(abi.encodePacked("a", bytes1(0x7F))));
-        vm.prank(a); uint256 id = k.write(TE, unicode"శ్రీనివాస");
+        _bad("Srini1"); _bad("Srini_S"); _bad("Srini, S"); _bad(unicode"శ్రీనివాస"); _bad(unicode"Sriní");
+        vm.prank(a); uint256 id = k.write(TE, "Srinivasa Somepalli");
         (,,, string memory nm,) = k.entry(id);
-        assertEq(nm, unicode"శ్రీనివాస");
+        assertEq(nm, "Srinivasa Somepalli");
+        vm.prank(a); id = k.write(TE, "A. B-C");
+        (,,, nm,) = k.entry(id);
+        assertEq(nm, "A. B-C");
     }
     function _bad(string memory nm) internal {
         vm.expectRevert(EternalRamaKoti.BadName.selector);

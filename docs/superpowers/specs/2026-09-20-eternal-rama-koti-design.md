@@ -79,9 +79,9 @@ struct Entry {
 
 1. `lang = langOf[keccak256(bytes(rama))]`; revert `UnknownForm()` if unset. Ids are
    stored plus one so id 0 is distinguishable from unset.
-2. Validate `name`: 1 to 31 bytes; every byte must be `>= 0x20`, not `0x7F`, and not
-   one of `< > & " ' \` `. Revert `BadName()` otherwise. This makes the name safe to
-   embed in JSON and SVG without escaping.
+2. Validate `name`: 1 to 31 bytes; English only. Every byte must be `A-Z`, `a-z`,
+   space, `.` or `-`. Revert `BadName()` otherwise. This makes the name safe to embed
+   in JSON and SVG without escaping, and guarantees it renders on every viewer.
 3. `count += 1; id = count`.
 4. If `written[msg.sender] == 0` then `writers += 1`. `written[msg.sender] += 1`.
 5. Store `entries[id]`.
@@ -223,7 +223,6 @@ Web app: manual checklist on Sepolia in a real browser, including a Telugu name.
   paid by the writer; one crore of writes ≈ $200,000 collectively. Gas spikes raise
   it linearly. The page shows live cost before every signature.
 - Bots can write at their own expense. The count measures writes, not intent.
-- The devotee's name renders with the viewer's system fonts. Indic names may show
-  as boxes on renderers without Indic fonts; the Rama form itself never will,
-  because it is an outline.
+- The devotee's name is English-only by rule, so it renders on every viewer with a
+  generic serif. The Rama form is an outline and never depends on fonts.
 - Public RPCs can rate-limit. Config lists three per chain.
