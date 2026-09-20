@@ -125,7 +125,8 @@ button.quiet { background: transparent; color: var(--pen); border: 1px solid var
 .entries .glyph { height: 20px; width: auto; flex: none; }
 .entries .glyph path { fill: var(--ink); }
 .entries .who { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-.entries .idx { color: var(--muted); font-size: 16px; flex: none; }
+.entries .idx { color: var(--muted); font-size: 16px; flex: none; text-decoration: none; }
+.entries .idx:hover { text-decoration: underline; }
 .entries .empty { color: var(--muted); }
 .inkin { clip-path: inset(0 100% 0 0); animation: inkin 900ms ease-out forwards; }
 @keyframes inkin { to { clip-path: inset(0 0 0 0); } }

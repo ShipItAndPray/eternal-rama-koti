@@ -75,6 +75,7 @@ function ago(ts) {
   return `${Math.floor(d / 86400)} d ago`;
 }
 function short(a) { return a.slice(0, 6) + "…" + a.slice(-4); }
+function nftUrl(id) { return `${CHAIN.blockscout}/token/${CHAIN.koti}/instance/${id}`; }
 function status(msg, bad = false) { const el = $("status"); el.textContent = msg; el.style.color = bad ? "var(--ink)" : ""; }
 
 // ---------- language picker ----------
@@ -241,8 +242,9 @@ async function offer() {
     const r = $("result");
     r.hidden = false;
     r.innerHTML = `<img src="${meta.image}" alt="${esc(meta.name)}, written by ${esc(name)}">
-      <p>Written. Entry ${indian(id)}. You have written ${indian(mine)} ${mine === 1n ? "name" : "names"}.
-      <a href="${CHAIN.explorer}/tx/${hash}">See the transaction</a>.</p>`;
+      <p>Written. Entry ${indian(id)}. You have written ${indian(mine)} ${mine === 1n ? "name" : "names"}.</p>
+      <p><a href="${nftUrl(id)}">See your NFT</a> or <a href="${CHAIN.explorer}/tx/${hash}">the transaction</a>.
+      To see it in MetaMask, open the NFTs tab, choose Import NFT, and enter the contract address with token ID ${id}.</p>`;
     status("");
     $("rama").value = ""; onType();
     prependEntry({ id, lang: f.id, name, timestamp: Math.floor(Date.now() / 1000) }, true);
@@ -273,7 +275,7 @@ async function refreshCounts() {
   updateOffer();
 }
 function entryRow(e, inkin) {
-  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><span class="idx">${indian(e.id)}, ${ago(e.timestamp)}</span></li>`;
+  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><a class="idx" href="${nftUrl(e.id)}">${indian(e.id)}, ${ago(e.timestamp)}</a></li>`;
 }
 function prependEntry(e, inkin) {
   const ol = $("recent");
@@ -324,6 +326,7 @@ selectForm(0);
 onName();
 if (CHAIN.koti) {
   $("contract-link").href = `${CHAIN.explorer}/address/${CHAIN.koti}`;
+  $("collection-link").href = `${CHAIN.blockscout}/token/${CHAIN.koti}`;
   refreshCounts(); loadRecent(); refreshCost();
   setInterval(refreshCounts, 20000);
 } else {
@@ -332,4 +335,5 @@ if (CHAIN.koti) {
   $("cost").textContent = "The book is not open yet. The contract has not been deployed.";
   $("recent").innerHTML = `<li class="empty">The book opens when the contract is deployed.</li>`;
   $("contract-link").removeAttribute("href");
+  $("collection-link").removeAttribute("href");
 }
