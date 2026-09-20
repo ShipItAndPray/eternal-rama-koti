@@ -13,6 +13,7 @@
       "రా",
       "మ"
     ],
+    "tradition": "Telugu",
     "box": [
       175,
       40,
@@ -34,6 +35,7 @@
       " ராம",
       " ஜெயம்"
     ],
+    "tradition": "Tamil",
     "box": [
       40,
       126,
@@ -53,11 +55,72 @@
       "रा",
       "म"
     ],
+    "tradition": "Hindi",
     "box": [
       183,
       40,
       635,
       320
+    ]
+  },
+  {
+    "id": 3,
+    "language": "English",
+    "form": "Sri Rama",
+    "romanized": [
+      "sri",
+      "rama"
+    ],
+    "parts": [
+      "Sri",
+      " Rama"
+    ],
+    "tradition": "Telugu",
+    "box": [
+      40,
+      116,
+      920,
+      167
+    ]
+  },
+  {
+    "id": 4,
+    "language": "English",
+    "form": "Sri Rama Jayam",
+    "romanized": [
+      "sri",
+      "rama",
+      "jayam|jeyam"
+    ],
+    "parts": [
+      "Sri",
+      " Rama",
+      " Jayam"
+    ],
+    "tradition": "Tamil",
+    "box": [
+      40,
+      138,
+      920,
+      123
+    ]
+  },
+  {
+    "id": 5,
+    "language": "English",
+    "form": "Ram",
+    "romanized": [
+      "ram"
+    ],
+    "parts": [
+      "Ram"
+    ],
+    "tradition": "Hindi",
+    "box": [
+      40,
+      41,
+      920,
+      317
     ]
   }
 ]

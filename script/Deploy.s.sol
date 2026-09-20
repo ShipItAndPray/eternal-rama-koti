@@ -9,7 +9,7 @@ contract Deploy is Script {
     function run() external {
         uint256 pk = vm.envUint("DEPLOYER_KEY");
         vm.startBroadcast(pk);
-        address[3] memory g;
+        address[6] memory g;
         for (uint8 i = 0; i < Forms.COUNT; i++) {
             g[i] = DataStore.put(bytes(vm.readFile(string.concat("glyphs/", vm.toString(i), ".txt"))));
             console2.log("glyph", i, g[i]);

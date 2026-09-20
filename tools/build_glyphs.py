@@ -16,10 +16,13 @@ OUT = os.path.join(ROOT, "glyphs")
 # (id, language, form, font family, romanized syllables, script syllables)
 # romanized and parts must have the same length; parts joined == form.
 FORMS = [
-    # (id, language, form, font family, romanized syllables, script syllables)
-    (0, "Telugu", "శ్రీరామ",        "NotoSerifTelugu",     ["sri", "ra", "ma"],            ["శ్రీ", "రా", "మ"]),
-    (1, "Tamil",  "ஸ்ரீ ராம ஜெயம்", "NotoSerifTamil",      ["sri", "rama", "jeyam|jayam"], ["ஸ்ரீ", " ராம", " ஜெயம்"]),
-    (2, "Hindi",  "राम",            "NotoSerifDevanagari", ["ra", "m"],                    ["रा", "म"]),
+    # (id, language, form, font family, romanized syllables, script syllables, tradition)
+    (0, "Telugu",  "శ్రీరామ",         "NotoSerifTelugu",     ["sri", "ra", "ma"],            ["శ్రీ", "రా", "మ"],        "Telugu"),
+    (1, "Tamil",   "ஸ்ரீ ராம ஜெயம்",  "NotoSerifTamil",      ["sri", "rama", "jeyam|jayam"], ["ஸ்ரீ", " ராம", " ஜெயம்"], "Tamil"),
+    (2, "Hindi",   "राम",             "NotoSerifDevanagari", ["ra", "m"],                    ["रा", "म"],               "Hindi"),
+    (3, "English", "Sri Rama",        "NotoSerif",           ["sri", "rama"],                ["Sri", " Rama"],          "Telugu"),
+    (4, "English", "Sri Rama Jayam",  "NotoSerif",           ["sri", "rama", "jayam|jeyam"], ["Sri", " Rama", " Jayam"], "Tamil"),
+    (5, "English", "Ram",             "NotoSerif",           ["ram"],                        ["Ram"],                   "Hindi"),
 ]
 BOX_W, BOX_H, PAD = 1000, 400, 40
 
@@ -72,14 +75,14 @@ def normalize(rec):
 def main():
     os.makedirs(OUT, exist_ok=True)
     forms_json, previews = [], []
-    for id_, lang, form, family, rom, parts in FORMS:
+    for id_, lang, form, family, rom, parts, trad in FORMS:
         assert "".join(parts) == form and len(parts) == len(rom), (lang, parts)
         fp = font_path(family)
         rec, _ = outline(fp, form)
         d, box = normalize(rec)
         with open(os.path.join(OUT, f"{id_}.txt"), "w", encoding="utf-8") as f:
             f.write(d)
-        forms_json.append({"id": id_, "language": lang, "form": form, "romanized": rom, "parts": parts, "box": box})
+        forms_json.append({"id": id_, "language": lang, "form": form, "romanized": rom, "parts": parts, "tradition": trad, "box": box})
         previews.append(f'<figure><svg viewBox="0 0 {BOX_W} {BOX_H}" width="300"><rect width="{BOX_W}" height="{BOX_H}" fill="#FBF3E4"/><path d="{d}" fill="#9B1C1C"/></svg><figcaption>{id_} {lang} · {form} · {os.path.basename(fp)} · {len(d)} bytes</figcaption></figure>')
         print(f"{id_} {lang:10s} {len(d):6d} bytes  {os.path.basename(fp)}")
     with open(os.path.join(OUT, "forms.json"), "w", encoding="utf-8") as f:

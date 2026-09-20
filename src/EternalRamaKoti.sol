@@ -9,7 +9,7 @@ import {Base64} from "./lib/Base64.sol";
 contract EternalRamaKoti {
     uint256 public constant KOTI = 10_000_000;
     uint256 public constant MAX_NAME_BYTES = 31; // English letters, space, period, hyphen only
-    uint8 public constant LANG_COUNT = 3; // must equal Forms.COUNT; checked in the constructor
+    uint8 public constant LANG_COUNT = 6; // must equal Forms.COUNT; checked in the constructor
 
     struct Entry { address writer; uint8 lang; uint40 timestamp; uint8 nameLen; bytes32 name; }
 
@@ -18,7 +18,7 @@ contract EternalRamaKoti {
     mapping(address => uint256) public written;        // slot 2
     mapping(uint256 => Entry) internal _entries;       // slot 3
     mapping(bytes32 => uint8) internal _langPlusOne;   // slot 4
-    address[3] internal _glyphs;
+    address[6] internal _glyphs;
 
     event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
     event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
@@ -33,7 +33,7 @@ contract EternalRamaKoti {
     error Soulbound();
     error NotAllowed();
 
-    constructor(address[3] memory glyphs) {
+    constructor(address[6] memory glyphs) {
         assert(LANG_COUNT == Forms.COUNT);
         _glyphs = glyphs;
         for (uint8 i = 0; i < LANG_COUNT; i++) _langPlusOne[keccak256(bytes(Forms.form(i)))] = i + 1;
@@ -80,6 +80,7 @@ contract EternalRamaKoti {
     function kotisCompleted() external view returns (uint256) { return count / KOTI; }
     function forms(uint8 lang) external pure returns (string memory) { return Forms.form(lang); }
     function languages(uint8 lang) external pure returns (string memory) { return Forms.language(lang); }
+    function traditions(uint8 lang) external pure returns (string memory) { return Forms.tradition(lang); }
 
     function entry(uint256 id) external view returns (address writer, uint8 lang, uint40 timestamp, string memory writerName, string memory form) {
         Entry memory e = _get(id);
@@ -108,7 +109,7 @@ contract EternalRamaKoti {
         Entry memory e = _get(id);
         string memory nm = _name(e);
         string memory svg = Renderer.svg(DataStore.get(_glyphs[e.lang]), nm, id);
-        return Renderer.json(Forms.form(e.lang), Forms.language(e.lang), nm, e.writer, id, e.timestamp, svg);
+        return Renderer.json(Forms.form(e.lang), Forms.language(e.lang), Forms.tradition(e.lang), nm, e.writer, id, e.timestamp, svg);
     }
 
     function contractURI() external view returns (string memory) {
