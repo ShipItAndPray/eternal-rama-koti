@@ -32,20 +32,20 @@
     <div class="write-grid">
     <div class="fields">
     <div class="line">
-      <label for="form">Language</label>
+      <label for="form"><span class="step">1</span>Choose your language</label>
       <select id="form" aria-describedby="formhelp"></select>
       <p class="help" id="formhelp"></p>
     </div>
 
     <div class="line">
-      <label for="rama">Type <span id="romhint" class="rom">srirama</span> and it appears below, or type the word itself</label>
+      <label for="rama"><span class="step">2</span>Type the name of Rama here</label>
+      <input id="rama" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="typehelp" placeholder="srirama">
+      <p class="help" id="typehelp">Type <span id="romhint" class="rom">srirama</span> with your keyboard and the script appears on your card, or type the word itself.</p>
       <div class="ink" id="ink" aria-live="polite"></div>
-      <input id="rama" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="typehelp">
-      <p class="help" id="typehelp"></p>
     </div>
 
     <div class="line">
-      <label for="name">Your name, in English letters</label>
+      <label for="name"><span class="step">3</span>Your name, in English letters</label>
       <input id="name" maxlength="31" autocomplete="off" spellcheck="false" placeholder="Srinivasa" aria-describedby="namemeta">
       <p class="help" id="namemeta">0 of 31</p>
     </div>
@@ -56,6 +56,7 @@
     </div>
     </div>
 
+    <p class="label"><span class="step">4</span>Offer it to the book</p>
     <p class="cost" id="cost">Checking the cost of one name.</p>
 
     <div class="actions">

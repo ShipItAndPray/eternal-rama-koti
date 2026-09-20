@@ -93,6 +93,7 @@ function selectForm(id) {
   $("form").value = String(id);
   $("formhelp").textContent = f.language === "English" ? `The ${f.tradition} form, written in English letters.` : `The ${f.tradition} tradition, in ${f.language} script.`;
   $("romhint").textContent = hintFor(f);
+  $("rama").placeholder = hintFor(f);
   $("rama").value = "";
   onType();
   renderCard();
@@ -110,8 +111,9 @@ function onType() {
   if (complete) ink.innerHTML = glyph(f.id, 52);
   else ink.textContent = partial;
   const help = $("typehelp");
-  if (raw === "") { help.textContent = ""; help.className = "help"; }
-  else if (complete) { help.textContent = "Written. Now add your name."; help.className = "help"; }
+  const base = `Type <span id="romhint" class="rom">${hintFor(f)}</span> with your keyboard and the script appears on your card, or type the word itself.`;
+  if (raw === "") { help.innerHTML = base; help.className = "help"; }
+  else if (complete) { help.textContent = "Written. Now add your name."; help.className = "help ok"; }
   else if (onTrack) { help.textContent = "Keep going."; help.className = "help"; }
   else { help.textContent = `Only the letters of ${hintFor(f)}, in order.`; help.className = "help bad"; }
   updateOffer();
