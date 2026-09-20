@@ -57,13 +57,13 @@ library Renderer {
     }
 
     function json(
-        string memory form, string memory language, string memory tradition, string memory name,
-        address writer, uint256 id, uint40 ts, string memory svgStr
+        string memory form, string memory language, string memory name, address writer,
+        uint256 id, uint40 ts, string memory svgStr
     ) internal pure returns (string memory) {
         string memory j = string.concat(
             _head(form, name, id),
             "\"image\":\"data:image/svg+xml;base64,", Base64.encode(bytes(svgStr)), "\",",
-            "\"attributes\":[", _attrs(language, tradition, name, writer), _numbers(id, ts), "]}"
+            "\"attributes\":[", _attrs(language, name, writer), _numbers(id, ts), "]}"
         );
         return string.concat("data:application/json;base64,", Base64.encode(bytes(j)));
     }
@@ -76,10 +76,9 @@ library Renderer {
         );
     }
 
-    function _attrs(string memory language, string memory tradition, string memory name, address writer) private pure returns (string memory) {
+    function _attrs(string memory language, string memory name, address writer) private pure returns (string memory) {
         return string.concat(
             "{\"trait_type\":\"Language\",\"value\":\"", language, "\"},",
-            "{\"trait_type\":\"Tradition\",\"value\":\"", tradition, "\"},",
             "{\"trait_type\":\"Written by\",\"value\":\"", name, "\"},",
             "{\"trait_type\":\"Writer\",\"value\":\"", hexAddr(writer), "\"},"
         );

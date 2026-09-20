@@ -22,11 +22,10 @@ contract MetadataTest is Test {
         string memory j = _decode(k.tokenURI(1), "data:application/json;base64,");
         assertEq(vm.parseJsonString(j, ".name"), unicode"శ్రీరామ #1");
         assertEq(vm.parseJsonString(j, ".attributes[0].value"), "Telugu");
-        assertEq(vm.parseJsonString(j, ".attributes[1].value"), "Telugu");
-        assertEq(vm.parseJsonString(j, ".attributes[2].value"), "Srinivasa Somepalli");
-        assertEq(vm.parseJsonString(j, ".attributes[3].value"), "0x00000000000000000000000000000000000a11ce");
+        assertEq(vm.parseJsonString(j, ".attributes[1].value"), "Srinivasa Somepalli");
+        assertEq(vm.parseJsonString(j, ".attributes[2].value"), "0x00000000000000000000000000000000000a11ce");
+        assertEq(vm.parseJsonUint(j, ".attributes[3].value"), 1);
         assertEq(vm.parseJsonUint(j, ".attributes[4].value"), 1);
-        assertEq(vm.parseJsonUint(j, ".attributes[5].value"), 1);
         string memory svg = _decode(vm.parseJsonString(j, ".image"), "data:image/svg+xml;base64,");
         assertTrue(vm.indexOf(svg, "<svg xmlns=\"http://www.w3.org/2000/svg\"") == 0);
         assertTrue(vm.indexOf(svg, ">Srinivasa Somepalli<") != type(uint256).max);
@@ -41,12 +40,11 @@ contract MetadataTest is Test {
         assertEq(vm.parseJsonString(j, ".name"), "Eternal Rama Koti");
         assertTrue(bytes(vm.parseJsonString(j, ".image")).length > 30);
     }
-    function test_englishFormCarriesTradition() public {
-        vm.prank(a); uint256 id = k.write("Sri Rama Jayam", "Meena");
+    function test_tamilPhraseRenders() public {
+        vm.prank(a); uint256 id = k.write(unicode"ஸ்ரீ ராம ஜெயம்", "Meena");
         string memory j = _decode(k.tokenURI(id), "data:application/json;base64,");
-        assertEq(vm.parseJsonString(j, ".name"), "Sri Rama Jayam #2");
-        assertEq(vm.parseJsonString(j, ".attributes[0].value"), "English");
-        assertEq(vm.parseJsonString(j, ".attributes[1].value"), "Tamil");
+        assertEq(vm.parseJsonString(j, ".name"), unicode"ஸ்ரீ ராம ஜெயம் #2");
+        assertEq(vm.parseJsonString(j, ".attributes[0].value"), "Tamil");
     }
     function test_everyLanguageRenders() public {
         for (uint8 i = 0; i < k.LANG_COUNT(); i++) { vm.prank(a); uint256 id = k.write(k.forms(i), "N"); k.tokenURI(id); }

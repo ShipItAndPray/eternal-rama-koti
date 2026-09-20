@@ -27,22 +27,20 @@ after deploy. A static web page is the writing surface.
 
 ## 3. Languages and forms
 
-Three regional writing traditions, each in its own script and in English. Six forms
-total, fixed forever at deploy. Every token records both its language and its tradition.
+Three regional writing traditions, each in its own script. Three forms total, fixed
+forever at deploy.
 
-| id | Language | Form | Tradition |
+| id | Language | Form | Basis |
 |---|---|---|---|
-| 0 | Telugu | శ్రీరామ | Telugu (Rama Koti, Bhadrachalam) |
-| 1 | Tamil | ஸ்ரீ ராம ஜெயம் | Tamil (Sri Rama Jayam; Tamil sources spell it with ஜெ) |
-| 2 | Hindi | राम | Hindi (Ram Naam Lekhan; Ram Naam Bank, Varanasi) |
-| 3 | English | Sri Rama | Telugu |
-| 4 | English | Sri Rama Jayam | Tamil |
-| 5 | English | Ram | Hindi |
+| 0 | Telugu | శ్రీరామ | Rama Koti, Bhadrachalam |
+| 1 | Tamil | ஸ்ரீ ராம ஜெயம் | Sri Rama Jayam likhita japam; Tamil sources spell it with ஜெ |
+| 2 | Hindi | राम | Ram Naam Lekhan; Ram Naam Bank, Varanasi |
 
 The contract maps `keccak256(bytes(form))` to form id. Any other bytes revert.
-Left out because no written-japa tradition could be sourced: Kannada, Malayalam,
-Gujarati, Bengali, Odia, Punjabi. The Marathi and Kannada 13-syllable mantra is left
-out because it contains Rama three times, which breaks the one-transaction-one-name rule.
+Left out deliberately: English (the owner judged it added too many words), and
+Kannada, Malayalam, Gujarati, Bengali, Odia, Punjabi, for which no written-japa
+tradition could be sourced. The Marathi and Kannada 13-syllable mantra is left out
+because it contains Rama three times, which breaks the one-transaction-one-name rule.
 
 ## 4. Contract: `EternalRamaKoti.sol`
 
@@ -51,7 +49,7 @@ encoder lives in `src/lib/`.
 
 ### Constants
 
-`KOTI = 10_000_000`. `MAX_NAME_BYTES = 31`. `LANG_COUNT = Forms.COUNT = 6`.
+`KOTI = 10_000_000`. `MAX_NAME_BYTES = 31`. `LANG_COUNT = Forms.COUNT = 3`.
 
 ### State
 
@@ -121,7 +119,6 @@ The owner can flip this before mainnet; it is a one-line change and a test chang
   "image": "data:image/svg+xml;base64,...",
   "attributes": [
     {"trait_type":"Language","value":"Telugu"},
-    {"trait_type":"Tradition","value":"Telugu"},
     {"trait_type":"Written by","value":"<name>"},
     {"trait_type":"Index","display_type":"number","value":12345},
     {"trait_type":"Koti","display_type":"number","value":1},
