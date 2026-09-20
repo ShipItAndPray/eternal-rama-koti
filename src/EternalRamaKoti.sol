@@ -91,6 +91,49 @@ contract EternalRamaKoti {
 
     function ownerOf(uint256 id) public view returns (address) { return _get(id).writer; }
 
+
+    // ------------------------------------------------------------ ERC-721 (soulbound)
+
+    function name() external pure returns (string memory) { return "Eternal Rama Koti"; }
+    function symbol() external pure returns (string memory) { return "RAMA"; }
+
+    function balanceOf(address owner) external view returns (uint256) {
+        if (owner == address(0)) revert NoToken();
+        return written[owner];
+    }
+
+    function tokenURI(uint256 id) external view returns (string memory) {
+        Entry memory e = _get(id);
+        string memory nm = _name(e);
+        string memory svg = Renderer.svg(DataStore.get(_glyphs[e.lang]), nm, id);
+        return Renderer.json(Forms.form(e.lang), Forms.language(e.lang), nm, e.writer, id, e.timestamp, svg);
+    }
+
+    function contractURI() external view returns (string memory) {
+        string memory svg = string.concat(
+            "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 600\"><rect width=\"600\" height=\"600\" fill=\"#FBF3E4\"/>",
+            "<svg x=\"50\" y=\"200\" width=\"500\" height=\"200\" viewBox=\"0 0 1000 400\"><path d=\"", string(DataStore.get(_glyphs[0])), "\" fill=\"#9B1C1C\"/></svg></svg>"
+        );
+        string memory j = string.concat(
+            "{\"name\":\"Eternal Rama Koti\",\"description\":\"A shared Rama Koti on Ethereum. One transaction writes one name of Rama. ",
+            Renderer.indian(count), " written so far.\",\"image\":\"data:image/svg+xml;base64,", Base64.encode(bytes(svg)), "\"}"
+        );
+        return string.concat("data:application/json;base64,", Base64.encode(bytes(j)));
+    }
+
+    function transferFrom(address, address, uint256) external pure { revert Soulbound(); }
+    function safeTransferFrom(address, address, uint256) external pure { revert Soulbound(); }
+    function safeTransferFrom(address, address, uint256, bytes calldata) external pure { revert Soulbound(); }
+    function approve(address, uint256) external pure { revert Soulbound(); }
+    function setApprovalForAll(address, bool) external pure { revert Soulbound(); }
+    function getApproved(uint256 id) external view returns (address) { _get(id); return address(0); }
+    function isApprovedForAll(address, address) external pure returns (bool) { return false; }
+    function locked(uint256 id) external view returns (bool) { _get(id); return true; }
+
+    function supportsInterface(bytes4 i) external pure returns (bool) {
+        return i == 0x01ffc9a7 || i == 0x80ac58cd || i == 0x5b5e139f || i == 0xb45a3c0e;
+    }
+
     receive() external payable { revert NotAllowed(); }
     fallback() external payable { revert NotAllowed(); }
 }

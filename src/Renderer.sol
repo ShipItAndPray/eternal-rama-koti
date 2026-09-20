@@ -60,20 +60,35 @@ library Renderer {
         string memory form, string memory language, string memory name, address writer,
         uint256 id, uint40 ts, string memory svgStr
     ) internal pure returns (string memory) {
-        string memory img = string.concat("data:image/svg+xml;base64,", Base64.encode(bytes(svgStr)));
         string memory j = string.concat(
-            "{\"name\":\"", form, " #", indian(id), "\",",
-            "\"description\":\"One name of Rama, written by ", name, " on Ethereum. Entry ", indian(id), " of the Eternal Rama Koti.\",",
-            "\"image\":\"", img, "\",",
-            "\"attributes\":[",
-            "{\"trait_type\":\"Language\",\"value\":\"", language, "\"},",
-            "{\"trait_type\":\"Written by\",\"value\":\"", name, "\"},",
-            "{\"trait_type\":\"Writer\",\"value\":\"", hexAddr(writer), "\"},",
-            "{\"trait_type\":\"Index\",\"display_type\":\"number\",\"value\":", u(id), "},",
-            "{\"trait_type\":\"Koti\",\"display_type\":\"number\",\"value\":", u((id - 1) / KOTI + 1), "},",
-            "{\"trait_type\":\"Timestamp\",\"display_type\":\"date\",\"value\":", u(ts), "}",
-            "]}"
+            _head(form, name, id),
+            "\"image\":\"data:image/svg+xml;base64,", Base64.encode(bytes(svgStr)), "\",",
+            "\"attributes\":[", _attrs(language, name, writer), _numbers(id, ts), "]}"
         );
         return string.concat("data:application/json;base64,", Base64.encode(bytes(j)));
+    }
+
+    function _head(string memory form, string memory name, uint256 id) private pure returns (string memory) {
+        string memory idx = indian(id);
+        return string.concat(
+            "{\"name\":\"", form, " #", idx, "\",",
+            "\"description\":\"One name of Rama, written by ", name, " on Ethereum. Entry ", idx, " of the Eternal Rama Koti.\","
+        );
+    }
+
+    function _attrs(string memory language, string memory name, address writer) private pure returns (string memory) {
+        return string.concat(
+            "{\"trait_type\":\"Language\",\"value\":\"", language, "\"},",
+            "{\"trait_type\":\"Written by\",\"value\":\"", name, "\"},",
+            "{\"trait_type\":\"Writer\",\"value\":\"", hexAddr(writer), "\"},"
+        );
+    }
+
+    function _numbers(uint256 id, uint40 ts) private pure returns (string memory) {
+        return string.concat(
+            "{\"trait_type\":\"Index\",\"display_type\":\"number\",\"value\":", u(id), "},",
+            "{\"trait_type\":\"Koti\",\"display_type\":\"number\",\"value\":", u((id - 1) / KOTI + 1), "},",
+            "{\"trait_type\":\"Timestamp\",\"display_type\":\"date\",\"value\":", u(ts), "}"
+        );
     }
 }
