@@ -7,7 +7,7 @@ import {Helpers} from "./Helpers.sol";
 contract TokenTest is Test {
     EternalRamaKoti k; address a = address(0xA11CE); address b = address(0xB0B);
     string constant TE = unicode"శ్రీరామ";
-    function setUp() public { k = Helpers.deployKoti(); vm.prank(a); k.write(TE, "A"); }
+    function setUp() public { k = Helpers.deployKoti(); vm.prank(a); k.write(TE, "Ab"); }
 
     function test_nameSymbol() public view { assertEq(k.name(), "Eternal Rama Koti"); assertEq(k.symbol(), "RAMA"); }
     function test_ownerBalance() public view { assertEq(k.ownerOf(1), a); assertEq(k.balanceOf(a), 1); assertEq(k.balanceOf(b), 0); }

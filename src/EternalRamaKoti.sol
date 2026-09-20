@@ -14,9 +14,11 @@ contract EternalRamaKoti {
 
     struct Entry { address writer; uint8 lang; uint40 timestamp; uint8 nameLen; bytes32 name; }
 
+    struct Writer { uint128 count; uint64 lastBlock; }
+
     uint256 public count;                              // slot 0
     uint256 public writers;                            // slot 1
-    mapping(address => uint256) public written;        // slot 2
+    mapping(address => Writer) internal _writers;      // slot 2
     mapping(uint256 => Entry) internal _entries;       // slot 3
     mapping(bytes32 => uint8) internal _langPlusOne;   // slot 4
     address[6] internal _glyphs;
@@ -34,6 +36,7 @@ contract EternalRamaKoti {
     error Soulbound();
     error NotAllowed();
     error BookComplete();
+    error OnePerBlock();
 
     constructor(address[6] memory glyphs) {
         assert(LANG_COUNT == Forms.COUNT);
@@ -48,9 +51,12 @@ contract EternalRamaKoti {
         uint8 lp1 = _langPlusOne[keccak256(bytes(rama))];
         if (lp1 == 0) revert UnknownForm();
         (bytes32 packed, uint8 len) = _packName(writerName);
+        Writer storage w = _writers[msg.sender];
+        if (w.lastBlock == block.number) revert OnePerBlock(); // one name per address per block: no batching
         id = ++count;
-        if (written[msg.sender] == 0) writers++;
-        written[msg.sender]++;
+        if (w.count == 0) writers++;
+        w.count += 1;
+        w.lastBlock = uint64(block.number);
         _entries[id] = Entry(msg.sender, lp1 - 1, uint40(block.timestamp), len, packed);
         emit Transfer(address(0), msg.sender, id);
         emit Locked(id);
@@ -58,14 +64,24 @@ contract EternalRamaKoti {
         if (id == KOTI) emit KotiComplete(id);
     }
 
+    /// English letters with single separators. A space may follow a letter or a period, so
+    /// initials work ("K. Srinivas", "J.R.R. Tolkien"). A hyphen or period must follow a letter.
+    /// No leading separator; may end with a letter or a period. At least two letters. 1 to 31 bytes.
+    /// The character set is safe to embed in JSON and SVG without escaping.
     function _packName(string calldata writerName) internal pure returns (bytes32 packed, uint8 len) {
         bytes calldata b = bytes(writerName);
         if (b.length == 0 || b.length > MAX_NAME_BYTES) revert BadName();
+        uint8 prev = 0; // 0 start, 1 letter, 2 space, 3 hyphen, 4 period
+        uint256 letters = 0;
         for (uint256 i = 0; i < b.length; i++) {
             uint8 c = uint8(b[i]);
-            bool ok = c == 0x20 || c == 0x2D || c == 0x2E || (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A);
-            if (!ok) revert BadName();
+            if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A)) { prev = 1; letters++; }
+            else if (c == 0x20) { if (prev != 1 && prev != 4) revert BadName(); prev = 2; }
+            else if (c == 0x2D) { if (prev != 1) revert BadName(); prev = 3; }
+            else if (c == 0x2E) { if (prev != 1) revert BadName(); prev = 4; }
+            else revert BadName();
         }
+        if ((prev != 1 && prev != 4) || letters < 2) revert BadName();
         len = uint8(b.length);
         assembly { packed := calldataload(b.offset) }
         packed &= bytes32(type(uint256).max << (256 - uint256(len) * 8));
@@ -82,6 +98,8 @@ contract EternalRamaKoti {
 
     /// True once the book holds one crore names. No more writes are accepted after that.
     function complete() external view returns (bool) { return count >= KOTI; }
+    /// How many names this address has written.
+    function written(address a) public view returns (uint256) { return _writers[a].count; }
     function forms(uint8 lang) external pure returns (string memory) { return Forms.form(lang); }
     function languages(uint8 lang) external pure returns (string memory) { return Forms.language(lang); }
     function traditions(uint8 lang) external pure returns (string memory) { return Forms.tradition(lang); }
@@ -106,7 +124,7 @@ contract EternalRamaKoti {
 
     function balanceOf(address owner) external view returns (uint256) {
         if (owner == address(0)) revert NoToken();
-        return written[owner];
+        return _writers[owner].count;
     }
 
     function tokenURI(uint256 id) external view returns (string memory) {

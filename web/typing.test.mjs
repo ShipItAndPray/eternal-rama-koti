@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { matchTyping, hintFor } from "./typing.js";
+import { matchTyping, hintFor, validName } from "./typing.js";
 import { FORMS } from "./glyphs.js";
 
 const by = (lang, form) => FORMS.find((f) => f.language === lang && (!form || f.form === form));
@@ -48,4 +48,11 @@ test("another language's word does not complete this form", () => {
 test("native partial input is on track", () => {
   assert.equal(matchTyping(te, "శ్రీ").onTrack, true);
   assert.equal(matchTyping(te, "శ్రీరామ").complete, true);
+});
+
+test("name rule matches the contract", () => {
+  for (const ok of ["Srinivasa Somepalli", "A.B-C", "Sri", "Jean-Luc Picard", "J.R.R. Tolkien", "K. Srinivas", "R. K. Narayan", "Srinivasa S."])
+    assert.equal(validName(ok), true, ok);
+  for (const bad of ["", "A", "a".repeat(32), " Srini", "Srini ", "Srini  S", "...", "- - -", "-Srini", "Srini-", "Srini .S", "Srini -S", "Srini- S", "Srini..S", ".Srini", "S.", "Srini1", "Srini_S", "Srini, S", "శ్రీనివాస", "Sriní", "a<b", "a'b"])
+    assert.equal(validName(bad), false, JSON.stringify(bad));
 });

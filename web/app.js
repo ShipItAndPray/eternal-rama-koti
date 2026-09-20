@@ -3,7 +3,7 @@ import {
 } from "https://cdn.jsdelivr.net/npm/viem@2/+esm";
 import { CHAIN } from "./config.js";
 import { FORMS, PATHS } from "./glyphs.js";
-import { matchTyping, hintFor } from "./typing.js";
+import { matchTyping, hintFor, validName } from "./typing.js";
 
 const ABI = parseAbi([
   "function count() view returns (uint256)",
@@ -28,7 +28,6 @@ const pub = createPublicClient({ chain, transport: fallback(CHAIN.rpcs.map((u) =
 
 const $ = (id) => document.getElementById(id);
 const state = { lang: 0, complete: false, name: "", provider: null, account: null, busy: false, full: false, nextIndex: 1n, partial: "" };
-const NAME_RE = /^[A-Za-z .-]{1,31}$/;
 
 // ---------- formatting ----------
 function indian(n) {
@@ -58,7 +57,7 @@ ${word}
 </svg>`;
 }
 function renderCard() {
-  const name = NAME_RE.test(state.name.trim()) ? state.name.trim() : "";
+  const name = validName(state.name.trim()) ? state.name.trim() : "";
   $("card").innerHTML = cardSvg(state.lang, state.partial || "", state.complete, name, state.nextIndex);
 }
 function glyph(id, h, tight = false) {
@@ -125,7 +124,7 @@ function onName() {
   const bytes = new TextEncoder().encode(v).length;
   const meta = $("namemeta");
   if (v === "") { meta.textContent = "0 of 31"; meta.className = "help"; }
-  else if (!NAME_RE.test(v)) { meta.textContent = "English letters, spaces, periods and hyphens only."; meta.className = "help bad"; }
+  else if (!validName(v)) { meta.textContent = "English letters only, at least two, with single spaces, periods or hyphens between them."; meta.className = "help bad"; }
   else { meta.textContent = `${bytes} of 31`; meta.className = "help"; }
   renderCard();
   updateOffer();
@@ -140,7 +139,7 @@ $("rama").addEventListener("input", onType);
 $("name").addEventListener("input", onName);
 
 function updateOffer() {
-  const ok = CHAIN.koti && !state.full && state.complete && NAME_RE.test(state.name.trim()) && state.account && !state.busy;
+  const ok = CHAIN.koti && !state.full && state.complete && validName(state.name.trim()) && state.account && !state.busy;
   $("offer").disabled = !ok;
 }
 

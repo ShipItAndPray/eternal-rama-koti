@@ -79,13 +79,17 @@ struct Entry {
 1. Revert `BookComplete()` if `count >= KOTI`.
 2. `lang = langOf[keccak256(bytes(rama))]`; revert `UnknownForm()` if unset. Ids are
    stored plus one so id 0 is distinguishable from unset.
-2. Validate `name`: 1 to 31 bytes; English only. Every byte must be `A-Z`, `a-z`,
-   space, `.` or `-`. Revert `BadName()` otherwise. This makes the name safe to embed
-   in JSON and SVG without escaping, and guarantees it renders on every viewer.
-3. `count += 1; id = count`.
-4. If `written[msg.sender] == 0` then `writers += 1`. `written[msg.sender] += 1`.
-5. Store `entries[id]`.
-6. Emit `Transfer(address(0), msg.sender, id)` and `Written(address indexed writer,
+2. Validate `name`: 1 to 31 bytes of English letters with single separators. A space
+   may follow a letter or a period (so "K. Srinivas" works); a hyphen or period must
+   follow a letter; no leading separator; the name ends with a letter or a period; at
+   least two letters. Revert `BadName()` otherwise. Safe to embed in JSON and SVG, and
+   renders on every viewer.
+3. Revert `OnePerBlock()` if this address already wrote in the current block. This is
+   what makes "one transaction, one name" hold against contracts and batching wallets.
+4. `count += 1; id = count`.
+5. If this address has no writes yet, `writers += 1`. Record its count and this block.
+6. Store `entries[id]`.
+7. Emit `Transfer(address(0), msg.sender, id)` and `Written(address indexed writer,
    uint256 indexed id, uint8 lang)`.
 8. If `id == KOTI` emit `KotiComplete(uint256 count)`. The book is then closed forever.
 
@@ -222,7 +226,9 @@ Web app: manual checklist on Sepolia in a real browser, including a Telugu name.
   (measured 2026-09-20): deploy with ten glyph contracts ≈ $3; one write ≈ $0.02
   paid by the writer; one crore of writes ≈ $200,000 collectively. Gas spikes raise
   it linearly. The page shows live cost before every signature.
-- Bots can write at their own expense. The count measures writes, not intent.
+- Bots can write at their own expense, one name per address per block. The count
+  measures writes, not intent. Names are grammatically constrained but their meaning
+  cannot be judged on-chain; there is no moderator because there is no owner.
 - The devotee's name is English-only by rule, so it renders on every viewer with a
   generic serif. The Rama form is an outline and never depends on fonts.
 - Public RPCs can rate-limit. Config lists three per chain.
