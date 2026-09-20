@@ -41,10 +41,10 @@ contract EternalRamaKoti {
 
     // ---------------------------------------------------------------- writing
 
-    function write(string calldata rama, string calldata name) external returns (uint256 id) {
+    function write(string calldata rama, string calldata writerName) external returns (uint256 id) {
         uint8 lp1 = _langPlusOne[keccak256(bytes(rama))];
         if (lp1 == 0) revert UnknownForm();
-        (bytes32 packed, uint8 len) = _packName(name);
+        (bytes32 packed, uint8 len) = _packName(writerName);
         id = ++count;
         if (written[msg.sender] == 0) writers++;
         written[msg.sender]++;
@@ -55,8 +55,8 @@ contract EternalRamaKoti {
         if (id % KOTI == 0) emit KotiComplete(id / KOTI);
     }
 
-    function _packName(string calldata name) internal pure returns (bytes32 packed, uint8 len) {
-        bytes calldata b = bytes(name);
+    function _packName(string calldata writerName) internal pure returns (bytes32 packed, uint8 len) {
+        bytes calldata b = bytes(writerName);
         if (b.length == 0 || b.length > MAX_NAME_BYTES) revert BadName();
         for (uint256 i = 0; i < b.length; i++) {
             uint8 c = uint8(b[i]);
@@ -82,7 +82,7 @@ contract EternalRamaKoti {
     function languages(uint8 lang) external pure returns (string memory) { return Forms.language(lang); }
     function traditions(uint8 lang) external pure returns (string memory) { return Forms.tradition(lang); }
 
-    function entry(uint256 id) external view returns (address writer, uint8 lang, uint40 timestamp, string memory name, string memory form) {
+    function entry(uint256 id) external view returns (address writer, uint8 lang, uint40 timestamp, string memory writerName, string memory form) {
         Entry memory e = _get(id);
         return (e.writer, e.lang, e.timestamp, _name(e), Forms.form(e.lang));
     }
