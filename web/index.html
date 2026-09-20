@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eternal Rama Koti</title>
+<meta name="description" content="One transaction writes one name of Rama on Ethereum. A shared Rama Koti, fully on-chain, with no owner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gentium+Plus:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NNV3CN8D2N"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-NNV3CN8D2N');</script>
+</head>
+<body>
+<header class="cover">
+  <h1>Eternal Rama Koti</h1>
+  <p class="cover-line">One transaction writes one name of Rama on Ethereum. Forever.</p>
+</header>
+
+<main class="page">
+  <section class="ledger" aria-live="polite">
+    <p class="tally"><span id="count">…</span> of 1,00,00,000 names written<span id="koti"></span></p>
+    <div class="progress" role="progressbar" aria-label="Progress toward one crore" aria-valuemin="0" aria-valuemax="10000000" aria-valuenow="0"><span id="bar"></span></div>
+    <p class="tally-sub"><span id="writers">…</span> people have written so far. Each name is one transaction, kept by Ethereum for as long as Ethereum exists.</p>
+  </section>
+
+  <section class="write">
+    <h2>Write one name</h2>
+
+    <div class="langs" id="langs" role="radiogroup" aria-label="Language"></div>
+
+    <div class="line">
+      <label for="rama">Type <span id="romhint" class="rom">srirama</span>, or write the word itself</label>
+      <div class="ink" id="ink" aria-live="polite"></div>
+      <input id="rama" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-describedby="typehelp">
+      <p class="help" id="typehelp"></p>
+    </div>
+
+    <div class="line">
+      <label for="name">Your name, in English letters</label>
+      <input id="name" maxlength="31" autocomplete="off" spellcheck="false" placeholder="Srinivasa" aria-describedby="namemeta">
+      <p class="help" id="namemeta">0 of 31</p>
+    </div>
+
+    <p class="cost" id="cost">Checking the cost of one name.</p>
+
+    <div class="actions">
+      <button id="connect" class="quiet" type="button">Open your wallet</button>
+      <button id="offer" class="ink-btn" type="button" disabled>Offer to the book</button>
+    </div>
+    <p class="status" id="status" role="status"></p>
+    <div id="result" class="result" hidden></div>
+  </section>
+
+  <section class="recent">
+    <h2>Recently written</h2>
+    <ol id="recent" class="entries"><li class="empty">Reading the book.</li></ol>
+  </section>
+</main>
+
+<footer class="cover foot">
+  <p>The book has no owner, no admin, and no server. The contract cannot be paused, edited, or taken down by anyone. Every name you write is minted to you as a token that lives entirely on Ethereum, image included.</p>
+  <p><a id="contract-link" href="#">Contract on the explorer</a> <span class="sep">and</span> <a href="https://github.com/ShipItAndPray/eternal-rama-koti">source on GitHub</a>.</p>
+</footer>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
