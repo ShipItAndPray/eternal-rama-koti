@@ -11,6 +11,6 @@ export const CHAIN = {
   ],
   explorer: "https://sepolia.etherscan.io",
   blockscout: "https://eth-sepolia.blockscout.com",   // renders on-chain NFT images
-  koti: "0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef",
-  deployBlock: 11746350,
+  koti: "0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e",
+  deployBlock: 11746488,
 };

@@ -1,6 +1,19 @@
 {
   "sepolia": {
     "chainId": 11155111,
+    "koti": "0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e",
+    "glyphs": [
+      "0x5ce0de53298dbae702151f7e6f0ea1f4cbf3b62a",
+      "0x38b8f6795c86179c2fdfe33b4a10ebfb2d030962",
+      "0x78774237199f5a68bb08b40c01f54adc521fa49a",
+      "0x48dee50ffea8f6c2c067cc99fab525ed531c9dd7",
+      "0xf30a9935075e6a9c0a927287db7ab3bc1d09d1f8",
+      "0x66422211dcee6244effeeceef33136c9bb85cf1a"
+    ],
+    "deployBlock": 11746488
+  },
+  "sepolia_v1_retired": {
+    "chainId": 11155111,
     "koti": "0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef",
     "glyphs": [
       "0x3dab372102b96551e22ea6e85d1e4c8fccb94f24",

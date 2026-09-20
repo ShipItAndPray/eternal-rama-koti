@@ -37,7 +37,7 @@ The contract accepts exactly these byte sequences and nothing else.
 
 | Network | Contract | Deployed |
 |---|---|---|
-| Sepolia | [`0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef`](https://sepolia.etherscan.io/address/0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef) | 2026-09-20, block 11746350 |
+| Sepolia | [`0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e`](https://sepolia.etherscan.io/address/0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e) | 2026-09-20, block 11746488 (v2; v1 at `0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef` is retired) |
 
 Mainnet is a separate decision, not yet made.
 
@@ -46,7 +46,7 @@ Mainnet is a separate decision, not yet made.
 The page is a convenience. The contract is the truth. From Foundry's `cast`:
 
 ```bash
-cast send 0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef "write(string,string)" "శ్రీరామ" "Your Name" \
+cast send 0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e "write(string,string)" "శ్రీరామ" "Your Name" \
   --rpc-url https://ethereum-sepolia-rpc.publicnode.com --private-key <key>
 ```
 
@@ -56,8 +56,8 @@ Or use the explorer's Write Contract tab with `write(rama, writerName)`. The nam
 Read the book:
 
 ```bash
-cast call 0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef "count()(uint256)" --rpc-url https://ethereum-sepolia-rpc.publicnode.com
-cast call 0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
+cast call 0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e "count()(uint256)" --rpc-url https://ethereum-sepolia-rpc.publicnode.com
+cast call 0x32e2b577f4ab66b3ecc35bfc214e5cdaf800356e "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
 ```
 
 ## Gas
@@ -65,6 +65,21 @@ cast call 0x3d23391e3d44b74a26a7cf5f22d50f2af50202ef "tokenURI(uint256)(string)"
 Measured with `forge snapshot` on 2026-09-20: a repeat write costs about 87,700 gas and
 an address's first write about 109,900 gas. At mainnet's 0.063 gwei and ETH at $2,624
 that day, one name would cost about two cents. On Sepolia it costs nothing real.
+
+## Integrity
+
+What the contract enforces, with no owner and no moderator:
+
+- The Rama word must match one of the six forms byte for byte.
+- One name per address per block. A contract cannot loop `write()` and a batching
+  wallet cannot mint many names in one transaction.
+- Names are English letters with single separators, at least two letters, so "K. Srinivas"
+  passes and "...", "- - -", or "a" do not.
+- Nothing can be edited or removed once written. The book closes at one crore.
+
+What it cannot enforce: the meaning of a name. Any string of plain letters passes, and
+judging it would need a moderator, which would mean an owner. Spam costs the spammer
+real gas on mainnet, one transaction per name.
 
 ## Honest limitations
 
