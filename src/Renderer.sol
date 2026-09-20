@@ -3,8 +3,6 @@ pragma solidity ^0.8.24;
 import {Base64} from "./lib/Base64.sol";
 
 library Renderer {
-    uint256 internal constant KOTI = 10_000_000;
-
     function u(uint256 v) internal pure returns (string memory) {
         if (v == 0) return "0";
         uint256 t = v; uint256 n;
@@ -41,9 +39,6 @@ library Renderer {
     }
 
     function svg(bytes memory d, string memory name, uint256 id) internal pure returns (string memory) {
-        string memory koti = id > KOTI
-            ? string.concat("<text x=\"300\" y=\"672\" text-anchor=\"middle\" font-family=\"serif\" font-size=\"24\" fill=\"#7A5A3A\">Koti ", u((id - 1) / KOTI + 1), "</text>")
-            : "";
         return string.concat(
             "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 800\">",
             "<rect width=\"600\" height=\"800\" fill=\"#FBF3E4\"/>",
@@ -51,7 +46,6 @@ library Renderer {
             "<svg x=\"50\" y=\"200\" width=\"500\" height=\"200\" viewBox=\"0 0 1000 400\"><path d=\"", string(d), "\" fill=\"#9B1C1C\"/></svg>",
             "<text x=\"300\" y=\"560\" text-anchor=\"middle\" font-family=\"serif\" font-size=\"34\" fill=\"#3A2A1A\">", name, "</text>",
             "<text x=\"300\" y=\"620\" text-anchor=\"middle\" font-family=\"serif\" font-size=\"26\" fill=\"#7A5A3A\">#", indian(id), " of 1,00,00,000</text>",
-            koti,
             "</svg>"
         );
     }
@@ -88,7 +82,6 @@ library Renderer {
     function _numbers(uint256 id, uint40 ts) private pure returns (string memory) {
         return string.concat(
             "{\"trait_type\":\"Index\",\"display_type\":\"number\",\"value\":", u(id), "},",
-            "{\"trait_type\":\"Koti\",\"display_type\":\"number\",\"value\":", u((id - 1) / KOTI + 1), "},",
             "{\"trait_type\":\"Timestamp\",\"display_type\":\"date\",\"value\":", u(ts), "}"
         );
     }

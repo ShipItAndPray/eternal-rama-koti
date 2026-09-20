@@ -36,7 +36,7 @@ contract WriteTest is Test {
         vm.prank(b); k.write(TE, "B");
         assertEq(k.count(), 3); assertEq(k.writers(), 2);
         assertEq(k.written(a), 2); assertEq(k.written(b), 1);
-        assertEq(k.kotisCompleted(), 0);
+        assertFalse(k.complete());
     }
     function test_events() public {
         vm.expectEmit(true, true, true, true);
@@ -74,16 +74,15 @@ contract WriteTest is Test {
         (,,, string memory nm,) = k.entry(id);
         assertEq(bytes(nm).length, 1); assertEq(nm, "Z");
     }
-    function test_kotiComplete() public {
+    function test_bookClosesAtOneCrore() public {
         vm.store(address(k), bytes32(uint256(0)), bytes32(uint256(9_999_999)));
-        vm.expectEmit(true, false, false, true);
-        emit EternalRamaKoti.KotiComplete(1);
+        vm.expectEmit(false, false, false, true);
+        emit EternalRamaKoti.KotiComplete(10_000_000);
         vm.prank(a); uint256 id = k.write(TE, "A");
-        assertEq(id, 10_000_000); assertEq(k.kotisCompleted(), 1);
-        vm.store(address(k), bytes32(uint256(0)), bytes32(uint256(19_999_999)));
-        vm.expectEmit(true, false, false, true);
-        emit EternalRamaKoti.KotiComplete(2);
+        assertEq(id, 10_000_000); assertTrue(k.complete());
+        vm.expectRevert(EternalRamaKoti.BookComplete.selector);
         vm.prank(a); k.write(TE, "A");
+        assertEq(k.count(), 10_000_000);
     }
     function test_ethRejected() public {
         vm.deal(a, 1 ether);

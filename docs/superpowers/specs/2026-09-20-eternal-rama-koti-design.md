@@ -9,8 +9,8 @@
 One shared Rama Koti on Ethereum. A devotee picks their language, types the name of
 Rama in that script, adds their own name, and sends one transaction. The contract
 verifies the typed bytes against that language's canonical form, mints one NFT to the
-devotee, and advances a global count. One crore (1,00,00,000) writes completes a koti;
-the count continues into the next koti forever.
+devotee, and advances a global count. The book holds exactly one crore (1,00,00,000)
+names. Once the count reaches one crore, the contract refuses further writes.
 
 Every NFT is fully on-chain: the script, the devotee's name, the writer's address,
 the timestamp, and the sequence number are stored in the contract, and the image is
@@ -76,7 +76,8 @@ struct Entry {
 
 `write(string calldata rama, string calldata name)`:
 
-1. `lang = langOf[keccak256(bytes(rama))]`; revert `UnknownForm()` if unset. Ids are
+1. Revert `BookComplete()` if `count >= KOTI`.
+2. `lang = langOf[keccak256(bytes(rama))]`; revert `UnknownForm()` if unset. Ids are
    stored plus one so id 0 is distinguishable from unset.
 2. Validate `name`: 1 to 31 bytes; English only. Every byte must be `A-Z`, `a-z`,
    space, `.` or `-`. Revert `BadName()` otherwise. This makes the name safe to embed
@@ -86,13 +87,13 @@ struct Entry {
 5. Store `entries[id]`.
 6. Emit `Transfer(address(0), msg.sender, id)` and `Written(address indexed writer,
    uint256 indexed id, uint8 lang)`.
-7. If `id % KOTI == 0` emit `KotiComplete(uint256 indexed koti)`.
+8. If `id == KOTI` emit `KotiComplete(uint256 count)`. The book is then closed forever.
 
 `receive()` and `fallback()` revert. No other state-changing function exists.
 
 ### Views
 
-`count()`, `writers()`, `written(address)`, `kotisCompleted()`, `entry(uint256)`
+`count()`, `writers()`, `written(address)`, `complete()`, `entry(uint256)`
 returning the decoded entry with the name as a string and the language form,
 `forms(uint8)` returning the canonical string for a language id, `LANG_COUNT()`.
 
@@ -124,7 +125,6 @@ The owner can flip this before mainnet; it is a one-line change and a test chang
     {"trait_type":"Tradition","value":"Telugu"},
     {"trait_type":"Written by","value":"<name>"},
     {"trait_type":"Index","display_type":"number","value":12345},
-    {"trait_type":"Koti","display_type":"number","value":1},
     {"trait_type":"Timestamp","display_type":"date","value":1758400000}
   ]
 }
@@ -134,8 +134,8 @@ The owner can flip this before mainnet; it is a one-line change and a test chang
 
 Cream card, saffron rule, deep red ink. Centered: the Rama form as a glyph outline
 `<path>`, scaled to width. Below it, in a generic serif `<text>`: the devotee's name,
-then `#12,345 of 1,00,00,000` in Indian digit grouping, then `Koti 2` only when
-`id > KOTI`. No fonts, no external references, under 10 KB per token.
+then `#12,345 of 1,00,00,000` in Indian digit grouping. No fonts, no external
+references, under 10 KB per token.
 
 Glyph outlines are produced once, offline, by shaping each canonical form with
 HarfBuzz through Noto Serif (or Noto Sans where Serif is unavailable) for that script,

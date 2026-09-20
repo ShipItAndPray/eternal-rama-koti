@@ -25,9 +25,4 @@ contract RendererTest is Test {
         assertTrue(vm.indexOf(s, "Koti") == type(uint256).max);
         assertTrue(bytes(s).length < 10_000);
     }
-    function test_svgShowsKotiAfterFirst() public view {
-        bytes memory d = bytes(vm.readFile("glyphs/0.txt"));
-        string memory s = Renderer.svg(d, "Srini", 10_000_001);
-        assertTrue(vm.indexOf(s, "Koti 2") != type(uint256).max);
-    }
 }

@@ -5,7 +5,8 @@ import {Renderer} from "./Renderer.sol";
 import {DataStore} from "./lib/DataStore.sol";
 import {Base64} from "./lib/Base64.sol";
 
-/// Eternal Rama Koti. One transaction writes one name of Rama. No owner. No admin. Forever.
+/// Eternal Rama Koti. One transaction writes one name of Rama. The book holds exactly one crore.
+/// No owner. No admin. Forever.
 contract EternalRamaKoti {
     uint256 public constant KOTI = 10_000_000;
     uint256 public constant MAX_NAME_BYTES = 31; // English letters, space, period, hyphen only
@@ -25,13 +26,14 @@ contract EternalRamaKoti {
     event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
     event Locked(uint256 tokenId);
     event Written(address indexed writer, uint256 indexed id, uint8 lang);
-    event KotiComplete(uint256 indexed koti);
+    event KotiComplete(uint256 count);
 
     error UnknownForm();
     error BadName();
     error NoToken();
     error Soulbound();
     error NotAllowed();
+    error BookComplete();
 
     constructor(address[6] memory glyphs) {
         assert(LANG_COUNT == Forms.COUNT);
@@ -42,6 +44,7 @@ contract EternalRamaKoti {
     // ---------------------------------------------------------------- writing
 
     function write(string calldata rama, string calldata writerName) external returns (uint256 id) {
+        if (count >= KOTI) revert BookComplete();
         uint8 lp1 = _langPlusOne[keccak256(bytes(rama))];
         if (lp1 == 0) revert UnknownForm();
         (bytes32 packed, uint8 len) = _packName(writerName);
@@ -52,7 +55,7 @@ contract EternalRamaKoti {
         emit Transfer(address(0), msg.sender, id);
         emit Locked(id);
         emit Written(msg.sender, id, lp1 - 1);
-        if (id % KOTI == 0) emit KotiComplete(id / KOTI);
+        if (id == KOTI) emit KotiComplete(id);
     }
 
     function _packName(string calldata writerName) internal pure returns (bytes32 packed, uint8 len) {
@@ -77,7 +80,8 @@ contract EternalRamaKoti {
 
     // ------------------------------------------------------------------ views
 
-    function kotisCompleted() external view returns (uint256) { return count / KOTI; }
+    /// True once the book holds one crore names. No more writes are accepted after that.
+    function complete() external view returns (bool) { return count >= KOTI; }
     function forms(uint8 lang) external pure returns (string memory) { return Forms.form(lang); }
     function languages(uint8 lang) external pure returns (string memory) { return Forms.language(lang); }
     function traditions(uint8 lang) external pure returns (string memory) { return Forms.tradition(lang); }

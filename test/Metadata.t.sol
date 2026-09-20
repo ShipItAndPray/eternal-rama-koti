@@ -26,7 +26,7 @@ contract MetadataTest is Test {
         assertEq(vm.parseJsonString(j, ".attributes[2].value"), "Srinivasa Somepalli");
         assertEq(vm.parseJsonString(j, ".attributes[3].value"), "0x00000000000000000000000000000000000a11ce");
         assertEq(vm.parseJsonUint(j, ".attributes[4].value"), 1);
-        assertEq(vm.parseJsonUint(j, ".attributes[5].value"), 1);
+        assertEq(vm.parseJsonString(j, ".attributes[5].trait_type"), "Timestamp");
         string memory svg = _decode(vm.parseJsonString(j, ".image"), "data:image/svg+xml;base64,");
         assertTrue(vm.indexOf(svg, "<svg xmlns=\"http://www.w3.org/2000/svg\"") == 0);
         assertTrue(vm.indexOf(svg, ">Srinivasa Somepalli<") != type(uint256).max);

@@ -7,7 +7,7 @@ import { FORMS, PATHS } from "./glyphs.js";
 const ABI = parseAbi([
   "function count() view returns (uint256)",
   "function writers() view returns (uint256)",
-  "function kotisCompleted() view returns (uint256)",
+  "function complete() view returns (bool)",
   "function written(address) view returns (uint256)",
   "function write(string rama, string name) returns (uint256)",
   "function tokenURI(uint256) view returns (string)",
@@ -26,7 +26,7 @@ const chain = {
 const pub = createPublicClient({ chain, transport: fallback(CHAIN.rpcs.map((u) => http(u))) });
 
 const $ = (id) => document.getElementById(id);
-const state = { lang: 0, complete: false, name: "", provider: null, account: null, busy: false };
+const state = { lang: 0, complete: false, name: "", provider: null, account: null, busy: false, full: false };
 const NAME_RE = /^[A-Za-z .-]{1,31}$/;
 
 // ---------- formatting ----------
@@ -139,7 +139,7 @@ $("rama").addEventListener("input", onType);
 $("name").addEventListener("input", onName);
 
 function updateOffer() {
-  const ok = CHAIN.koti && state.complete && NAME_RE.test(state.name.trim()) && state.account && !state.busy;
+  const ok = CHAIN.koti && !state.full && state.complete && NAME_RE.test(state.name.trim()) && state.account && !state.busy;
   $("offer").disabled = !ok;
 }
 
@@ -228,15 +228,17 @@ $("offer").addEventListener("click", offer);
 // ---------- reading the book ----------
 async function refreshCounts() {
   if (!CHAIN.koti) return;
-  const [count, writers, kotis] = await Promise.all(
-    ["count", "writers", "kotisCompleted"].map((fn) => pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: fn }))
+  const [count, writers] = await Promise.all(
+    ["count", "writers"].map((fn) => pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: fn }))
   );
   $("count").textContent = indian(count);
   $("writers").textContent = indian(writers);
-  $("koti").textContent = kotis > 0n ? `, koti ${kotis + 1n}` : "";
-  const inKoti = count % KOTI;
-  $("bar").style.width = `${Number(inKoti * 10000n / KOTI) / 100}%`;
-  $("bar").parentElement.setAttribute("aria-valuenow", String(inKoti));
+  state.full = count >= KOTI;
+  $("koti").textContent = state.full ? ". The book is complete." : "";
+  $("bar").style.width = `${Number(count * 10000n / KOTI) / 100}%`;
+  $("bar").parentElement.setAttribute("aria-valuenow", String(count));
+  if (state.full) { $("cost").textContent = "One crore names have been written. The book is closed."; }
+  updateOffer();
 }
 function entryRow(e, inkin) {
   return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><span class="idx">${indian(e.id)}, ${ago(e.timestamp)}</span></li>`;
