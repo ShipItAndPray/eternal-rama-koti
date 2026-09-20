@@ -40,8 +40,10 @@ function indian(n) {
   if (rest) groups.unshift(rest);
   return groups.join(",") + "," + last;
 }
-function glyph(id, h) {
-  return `<svg class="glyph" viewBox="0 0 1000 400" height="${h}" aria-hidden="true"><path d="${PATHS[id]}"/></svg>`;
+function glyph(id, h, tight = false) {
+  const f = FORMS[id];
+  const vb = tight && f.box ? f.box.join(" ") : "0 0 1000 400";
+  return `<svg class="glyph" viewBox="${vb}" height="${h}" aria-hidden="true"><path d="${PATHS[id]}"/></svg>`;
 }
 function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function ago(ts) {
@@ -61,7 +63,7 @@ function renderLangs() {
   const box = $("langs");
   box.innerHTML = LANGS.map((l) => {
     const f = formsOf(l)[0];
-    return `<button type="button" class="lang" role="radio" aria-checked="false" data-lang="${esc(l)}" title="${esc(f.form)}">${glyph(f.id, 22)}<small>${esc(l)}</small></button>`;
+    return `<button type="button" class="lang" role="radio" aria-checked="false" data-lang="${esc(l)}" title="${esc(f.form)}">${glyph(f.id, 20, true)}<small>${esc(l)}</small></button>`;
   }).join("");
   box.querySelectorAll(".lang").forEach((b) => b.addEventListener("click", () => selectLanguage(b.dataset.lang)));
 }
@@ -72,7 +74,7 @@ function selectLanguage(lang) {
   if (fs.length > 1) {
     row.hidden = false;
     row.innerHTML = fs.map((f) =>
-      `<button type="button" class="variant" role="radio" aria-checked="false" data-id="${f.id}">${glyph(f.id, 18)}<small>${esc(f.tradition)} tradition</small></button>`
+      `<button type="button" class="variant" role="radio" aria-checked="false" data-id="${f.id}">${glyph(f.id, 16, true)}<small>${esc(f.tradition)} tradition</small></button>`
     ).join("");
     row.querySelectorAll(".variant").forEach((b) => b.addEventListener("click", () => selectForm(Number(b.dataset.id))));
   } else { row.hidden = true; row.innerHTML = ""; }
@@ -237,7 +239,7 @@ async function refreshCounts() {
   $("bar").parentElement.setAttribute("aria-valuenow", String(inKoti));
 }
 function entryRow(e, inkin) {
-  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 20)}<span class="who">${esc(e.name)}</span><span class="idx">${indian(e.id)}, ${ago(e.timestamp)}</span></li>`;
+  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><span class="idx">${indian(e.id)}, ${ago(e.timestamp)}</span></li>`;
 }
 function prependEntry(e, inkin) {
   const ol = $("recent");

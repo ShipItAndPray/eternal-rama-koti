@@ -67,7 +67,10 @@ def normalize(rec):
     ty = (BOX_H + h * s) / 2 + ymin * s
     pen = SVGPathPen(None, ntos=lambda v: str(int(round(v))))
     rec.replay(TransformPen(pen, (s, 0, 0, -s, tx, ty)))
-    return pen.getCommands()
+    # bounds of the normalized path, y-down, for tight cropping in the web picker
+    bx0, by0 = int(round(xmin * s + tx)), int(round(ty - ymax * s))
+    bw, bh = int(round(w * s)), int(round(h * s))
+    return pen.getCommands(), [bx0, by0, bw, bh]
 
 def main():
     os.makedirs(OUT, exist_ok=True)
@@ -76,10 +79,10 @@ def main():
         assert "".join(parts) == form and len(parts) == len(rom), (lang, parts)
         fp = font_path(family)
         rec, _ = outline(fp, form)
-        d = normalize(rec)
+        d, box = normalize(rec)
         with open(os.path.join(OUT, f"{id_}.txt"), "w", encoding="utf-8") as f:
             f.write(d)
-        forms_json.append({"id": id_, "language": lang, "form": form, "romanized": rom, "parts": parts, "tradition": trad})
+        forms_json.append({"id": id_, "language": lang, "form": form, "romanized": rom, "parts": parts, "tradition": trad, "box": box})
         previews.append(f'<figure><svg viewBox="0 0 {BOX_W} {BOX_H}" width="300"><rect width="{BOX_W}" height="{BOX_H}" fill="#FBF3E4"/><path d="{d}" fill="#9B1C1C"/></svg><figcaption>{id_} {lang} · {form} · {os.path.basename(fp)} · {len(d)} bytes</figcaption></figure>')
         print(f"{id_} {lang:10s} {len(d):6d} bytes  {os.path.basename(fp)}")
     with open(os.path.join(OUT, "forms.json"), "w", encoding="utf-8") as f:
