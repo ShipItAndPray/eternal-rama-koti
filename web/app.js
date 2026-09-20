@@ -18,6 +18,7 @@ const ABI = parseAbi([
 const WRITTEN = ABI.find((x) => x.type === "event" && x.name === "Written");
 const KOTI = 10_000_000n;
 const GAS_PER_WRITE = 110_000n;
+const RECENT = 10; // how many recent entries the page shows
 
 const chain = {
   id: CHAIN.id, name: CHAIN.name, nativeCurrency: CHAIN.nativeCurrency,
@@ -292,7 +293,7 @@ function prependEntry(e, inkin) {
   const ol = $("recent");
   ol.querySelector(".empty")?.remove();
   ol.insertAdjacentHTML("afterbegin", entryRow(e, inkin));
-  while (ol.children.length > 24) ol.lastElementChild.remove();
+  while (ol.children.length > RECENT) ol.lastElementChild.remove();
 }
 async function refreshCost() {
   try {
@@ -321,7 +322,7 @@ async function loadRecent() {
     let from = latest > 40000n ? latest - 40000n : 0n;
     if (from < BigInt(CHAIN.deployBlock)) from = BigInt(CHAIN.deployBlock);
     const logs = await pub.getLogs({ address: CHAIN.koti, event: WRITTEN, fromBlock: from, toBlock: "latest" });
-    const last = logs.slice(-24).reverse();
+    const last = logs.slice(-RECENT).reverse();
     const ol = $("recent");
     if (last.length === 0) { ol.innerHTML = `<li class="empty">Nothing written yet. The first line is yours.</li>`; return; }
     const entries = await Promise.all(last.map((l) => pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: "entry", args: [l.args.id] })));
