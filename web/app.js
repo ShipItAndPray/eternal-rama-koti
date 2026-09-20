@@ -144,50 +144,80 @@ function updateOffer() {
 }
 
 // ---------- wallet ----------
+// EIP-6963: every installed wallet announces itself; we list them all and let the devotee pick one.
 const providers = [];
+let walletsRendered = false;
 window.addEventListener("eip6963:announceProvider", (e) => {
   if (!providers.some((p) => p.info.uuid === e.detail.info.uuid)) providers.push(e.detail);
+  renderWallets();
 });
 window.dispatchEvent(new Event("eip6963:requestProvider"));
+setTimeout(renderWallets, 900); // legacy wallets that only set window.ethereum, or none at all
+
+function renderWallets() {
+  const box = $("wallets");
+  if (state.account) return;
+  const list = providers.slice();
+  if (list.length === 0 && window.ethereum) list.push({ info: { uuid: "legacy", name: "Browser wallet", icon: "" }, provider: window.ethereum });
+  if (list.length === 0) {
+    if (walletsRendered) return;
+    const here = encodeURIComponent(location.host + location.pathname);
+    box.innerHTML = `<p class="help">No wallet found in this browser. Install one, or open this page inside your wallet app.</p>
+      <div class="wallet-row">
+        <a class="wallet" href="https://metamask.io/download/">Install MetaMask</a>
+        <a class="wallet" href="https://metamask.app.link/dapp/${here}">Open in MetaMask app</a>
+      </div>`;
+    walletsRendered = true;
+    return;
+  }
+  box.innerHTML = `<p class="help">Choose your wallet.</p><div class="wallet-row">` + list.map((d) =>
+    `<button type="button" class="wallet" data-uuid="${esc(d.info.uuid)}">${d.info.icon ? `<img src="${esc(d.info.icon)}" alt="">` : ""}${esc(d.info.name)}</button>`
+  ).join("") + `</div>`;
+  box.querySelectorAll("button.wallet").forEach((b) => b.addEventListener("click", () => connect(list.find((d) => d.info.uuid === b.dataset.uuid))));
+  walletsRendered = true;
+}
 
 async function ensureChain(p) {
   const hex = "0x" + CHAIN.id.toString(16);
   const cur = await p.request({ method: "eth_chainId" });
   if (String(cur).toLowerCase() === hex) return;
+  status(`Switching your wallet to ${CHAIN.name}. Approve it in the wallet.`);
   try {
     await p.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hex }] });
   } catch (e) {
-    if (e && (e.code === 4902 || /unrecognized|not added/i.test(e.message || ""))) {
+    if (e && (e.code === 4902 || /unrecognized|not added|Unrecognized chain/i.test(e.message || ""))) {
       await p.request({ method: "wallet_addEthereumChain", params: [{
         chainId: hex, chainName: CHAIN.name, nativeCurrency: CHAIN.nativeCurrency, rpcUrls: CHAIN.rpcs, blockExplorerUrls: [CHAIN.explorer],
       }] });
     } else throw e;
   }
 }
-async function connect() {
-  const p = providers[0]?.provider || window.ethereum;
-  if (!p) {
-    const here = encodeURIComponent(location.host + location.pathname);
-    status("No wallet found in this browser. Open this page inside a wallet app, or install one.", true);
-    $("connect").outerHTML = `<a class="quiet btn" href="https://metamask.app.link/dapp/${here}">Open in MetaMask</a>`;
-    return;
-  }
+function walletError(e) {
+  const code = e?.code ?? e?.cause?.code;
+  if (code === 4001 || /rejected|denied/i.test(e?.message || "")) return "You closed the wallet prompt. Click your wallet to try again.";
+  if (code === -32002) return "Your wallet already has a request open. Open the wallet window and finish it.";
+  return e?.shortMessage || e?.message || "The wallet did not connect.";
+}
+async function connect(detail) {
+  const p = detail?.provider;
+  if (!p) { renderWallets(); return; }
+  status(`Opening ${detail.info.name}. Approve the connection there.`);
   try {
     const accounts = await p.request({ method: "eth_requestAccounts" });
     await ensureChain(p);
     state.provider = p; state.account = accounts[0];
-    $("connect").textContent = short(state.account);
+    $("wallets").innerHTML = `<p class="help">Connected to ${esc(detail.info.name)} as <span class="rom">${short(state.account)}</span>. <button type="button" class="linkish" id="switch">Use a different wallet</button></p>`;
+    $("switch").addEventListener("click", () => { state.account = null; state.provider = null; walletsRendered = false; renderWallets(); updateOffer(); });
     status("");
     const mine = await pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: "written", args: [state.account] });
     if (mine > 0n) status(`You have written ${indian(mine)} ${mine === 1n ? "name" : "names"} so far.`);
-    p.on?.("accountsChanged", (a) => { state.account = a[0] || null; $("connect").textContent = state.account ? short(state.account) : "Open your wallet"; updateOffer(); });
+    p.on?.("accountsChanged", (a) => { state.account = a[0] || null; if (!state.account) { walletsRendered = false; renderWallets(); } updateOffer(); });
     p.on?.("chainChanged", () => location.reload());
   } catch (e) {
-    status(e?.shortMessage || e?.message || "The wallet did not connect.", true);
+    status(walletError(e), true);
   }
   updateOffer();
 }
-$("connect").addEventListener("click", connect);
 
 // ---------- offering ----------
 async function offer() {
@@ -218,7 +248,7 @@ async function offer() {
     prependEntry({ id, lang: f.id, name, timestamp: Math.floor(Date.now() / 1000) }, true);
     await refreshCounts();
   } catch (e) {
-    status(e?.shortMessage || e?.message || "Something went wrong.", true);
+    status(walletError(e), true);
   } finally {
     state.busy = false; updateOffer();
   }
