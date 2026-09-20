@@ -2,7 +2,7 @@
 
 **One transaction writes one name of Rama on Ethereum. Forever.**
 
-Live page: _coming after the Sepolia deployment_
+Live page: https://shipitandpray.github.io/eternal-rama-koti/ (the book opens once the Sepolia contract is deployed)
 
 A shared Rama Koti. A devotee picks a language, types the name of Rama in that script,
 adds their own name, and sends one transaction. The contract checks the typed bytes
