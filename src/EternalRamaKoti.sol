@@ -37,9 +37,20 @@ contract EternalRamaKoti {
     error NotAllowed();
     error BookComplete();
     error OnePerBlock();
+    error OnlyWallets();
+    error BadGlyph();
 
     constructor(address[6] memory glyphs) {
         assert(LANG_COUNT == Forms.COUNT);
+        for (uint256 i = 0; i < 6; i++) {
+            address g = glyphs[i];
+            uint256 size;
+            assembly { size := extcodesize(g) }
+            if (size < 2) revert BadGlyph();
+            bytes memory first = new bytes(1);
+            assembly { extcodecopy(g, add(first, 32), 0, 1) }
+            if (first[0] != 0x00) revert BadGlyph(); // must be a STOP-prefixed data contract, not a delegation or code
+        }
         _glyphs = glyphs;
         for (uint8 i = 0; i < LANG_COUNT; i++) _langPlusOne[keccak256(bytes(Forms.form(i)))] = i + 1;
     }
@@ -48,15 +59,16 @@ contract EternalRamaKoti {
 
     function write(string calldata rama, string calldata writerName) external returns (uint256 id) {
         if (count >= KOTI) revert BookComplete();
+        if (msg.sender != tx.origin) revert OnlyWallets(); // a wallet address writes, never a contract: one tx, one name
         uint8 lp1 = _langPlusOne[keccak256(bytes(rama))];
         if (lp1 == 0) revert UnknownForm();
         (bytes32 packed, uint8 len) = _packName(writerName);
         Writer storage w = _writers[msg.sender];
-        if (w.lastBlock == block.number) revert OnePerBlock(); // one name per address per block: no batching
+        if (w.lastBlock == block.number + 1) revert OnePerBlock(); // one name per address per block (stored +1 so block 0 is not a sentinel)
         id = ++count;
         if (w.count == 0) writers++;
         w.count += 1;
-        w.lastBlock = uint64(block.number);
+        w.lastBlock = uint64(block.number + 1);
         _entries[id] = Entry(msg.sender, lp1 - 1, uint40(block.timestamp), len, packed);
         emit Transfer(address(0), msg.sender, id);
         emit Locked(id);
@@ -100,6 +112,8 @@ contract EternalRamaKoti {
     function complete() external view returns (bool) { return count >= KOTI; }
     /// How many names this address has written.
     function written(address a) public view returns (uint256) { return _writers[a].count; }
+    /// The data contract holding the glyph outline for a form.
+    function glyphs(uint8 lang) external view returns (address) { return _glyphs[lang]; }
     function forms(uint8 lang) external pure returns (string memory) { return Forms.form(lang); }
     function languages(uint8 lang) external pure returns (string memory) { return Forms.language(lang); }
     function traditions(uint8 lang) external pure returns (string memory) { return Forms.tradition(lang); }
@@ -159,6 +173,5 @@ contract EternalRamaKoti {
         return i == 0x01ffc9a7 || i == 0x80ac58cd || i == 0x5b5e139f || i == 0xb45a3c0e;
     }
 
-    receive() external payable { revert NotAllowed(); }
-    fallback() external payable { revert NotAllowed(); }
+    fallback() external { revert NotAllowed(); } // no receive(): plain ETH transfers revert too
 }

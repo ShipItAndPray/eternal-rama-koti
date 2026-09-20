@@ -84,16 +84,22 @@ struct Entry {
    follow a letter; no leading separator; the name ends with a letter or a period; at
    least two letters. Revert `BadName()` otherwise. Safe to embed in JSON and SVG, and
    renders on every viewer.
-3. Revert `OnePerBlock()` if this address already wrote in the current block. This is
-   what makes "one transaction, one name" hold against contracts and batching wallets.
-4. `count += 1; id = count`.
-5. If this address has no writes yet, `writers += 1`. Record its count and this block.
-6. Store `entries[id]`.
-7. Emit `Transfer(address(0), msg.sender, id)` and `Written(address indexed writer,
+3. Revert `OnlyWallets()` unless `msg.sender == tx.origin`. Only a wallet address writes,
+   never a contract, so a factory cannot mint many names in one transaction. This
+   excludes smart-contract wallets (Safe, ERC-4337 accounts); EIP-7702 wallets pass.
+4. Revert `OnePerBlock()` if this address already wrote in the current block (stored as
+   block + 1 so block 0 is not a sentinel). Together with rule 3 this makes "one
+   transaction, one name" hold, including against EIP-7702 batch execution.
+5. `count += 1; id = count`.
+6. If this address has no writes yet, `writers += 1`. Record its count and this block.
+7. Store `entries[id]`.
+8. Emit `Transfer(address(0), msg.sender, id)` and `Written(address indexed writer,
    uint256 indexed id, uint8 lang)`.
-8. If `id == KOTI` emit `KotiComplete(uint256 count)`. The book is then closed forever.
+9. If `id == KOTI` emit `KotiComplete(uint256 count)`. The book is then closed forever.
 
-`receive()` and `fallback()` revert. No other state-changing function exists.
+There is no `receive()`; `fallback()` is non-payable and reverts. No other state-changing
+function exists. The constructor rejects any glyph address that is not a STOP-prefixed data
+contract of at least two bytes, and `glyphs(uint8)` exposes the addresses.
 
 ### Views
 
@@ -156,9 +162,10 @@ from an address: under 130,000. `forge snapshot` committed.
 
 ## 5. Web app: `web/`
 
-Static. `index.html`, `app.js`, `style.css`, `config.js`, `glyphs.js` (the same ten
-paths, for local preview). `viem` from jsDelivr as an ES module. No build step.
-Hosted on GitHub Pages.
+Static. `index.html`, `app.js`, `style.css`, `config.js`, `glyphs.js`, `typing.js`, and
+`vendor/viem.js`, a pinned viem bundle built by `tools/web-build` so the page loads no
+script from any CDN. A Content Security Policy allows scripts from the page itself and
+the analytics tag only. Hosted on GitHub Pages.
 
 ### Reads, no wallet
 

@@ -1,6 +1,6 @@
 import {
   createPublicClient, createWalletClient, custom, http, fallback, parseAbi, formatEther, decodeEventLog,
-} from "https://cdn.jsdelivr.net/npm/viem@2/+esm";
+} from "./vendor/viem.js";
 import { CHAIN } from "./config.js";
 import { FORMS, PATHS } from "./glyphs.js";
 import { matchTyping, hintFor, validName } from "./typing.js";
@@ -73,7 +73,12 @@ function ago(ts) {
   if (d < 86400) return `${Math.floor(d / 3600)} h ago`;
   return `${Math.floor(d / 86400)} d ago`;
 }
-function short(a) { return a.slice(0, 6) + "…" + a.slice(-4); }
+function short(a) { a = String(a); return a.slice(0, 6) + "…" + a.slice(-4); }
+function b64json(uri) { // data:application/json;base64,... → object, UTF-8 safe (atob alone garbles Indic text)
+  const b64 = uri.split("base64,")[1];
+  const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
 function nftUrl(id) { return `${CHAIN.blockscout}/token/${CHAIN.koti}/instance/${id}`; }
 function status(msg, bad = false) { const el = $("status"); el.textContent = msg; el.style.color = bad ? "var(--ink)" : ""; }
 
@@ -206,7 +211,8 @@ async function connect(detail) {
     const accounts = await p.request({ method: "eth_requestAccounts" });
     await ensureChain(p);
     state.provider = p; state.account = accounts[0];
-    $("wallets").innerHTML = `<p class="help">Connected to ${esc(detail.info.name)} as <span class="rom">${short(state.account)}</span>. <button type="button" class="linkish" id="switch">Use a different wallet</button></p>`;
+    if (!/^0x[0-9a-fA-F]{40}$/.test(String(state.account))) throw new Error("The wallet returned an invalid address.");
+    $("wallets").innerHTML = `<p class="help">Connected to ${esc(detail.info.name)} as <span class="rom">${esc(short(state.account))}</span>. <button type="button" class="linkish" id="switch">Use a different wallet</button></p>`;
     $("switch").addEventListener("click", () => { state.account = null; state.provider = null; walletsRendered = false; renderWallets(); updateOffer(); });
     status("");
     const mine = await pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: "written", args: [state.account] });
@@ -230,19 +236,25 @@ async function offer() {
     status("Confirm in your wallet.");
     const hash = await wallet.writeContract({ address: CHAIN.koti, abi: ABI, functionName: "write", args: [f.form, name], account: state.account });
     status("Sent. Waiting for Ethereum to confirm.");
+    if (!/^0x[0-9a-fA-F]{64}$/.test(String(hash))) throw new Error("The wallet returned an invalid transaction hash.");
     const rc = await pub.waitForTransactionReceipt({ hash });
     if (rc.status !== "success") throw new Error("The transaction reverted.");
-    const ev = rc.logs.map((l) => { try { return decodeEventLog({ abi: ABI, data: l.data, topics: l.topics }); } catch { return null; } })
-      .find((d) => d && d.eventName === "Written");
+    const me = state.account.toLowerCase();
+    if (String(rc.from).toLowerCase() !== me) throw new Error("That transaction was not sent by your wallet.");
+    const ev = rc.logs
+      .filter((l) => String(l.address).toLowerCase() === CHAIN.koti.toLowerCase())
+      .map((l) => { try { return decodeEventLog({ abi: ABI, data: l.data, topics: l.topics }); } catch { return null; } })
+      .find((d) => d && d.eventName === "Written" && String(d.args.writer).toLowerCase() === me);
+    if (!ev) throw new Error("No write from your wallet was found in that transaction.");
     const id = ev.args.id;
     const uri = await pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: "tokenURI", args: [id] });
-    const meta = JSON.parse(atob(uri.split("base64,")[1]));
+    const meta = b64json(uri);
     const mine = await pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: "written", args: [state.account] });
     const r = $("result");
     r.hidden = false;
     r.innerHTML = `<img src="${meta.image}" alt="${esc(meta.name)}, written by ${esc(name)}">
       <p>Written. Entry ${indian(id)}. You have written ${indian(mine)} ${mine === 1n ? "name" : "names"}.</p>
-      <p><a href="${nftUrl(id)}">See your NFT</a> or <a href="${CHAIN.explorer}/tx/${hash}">the transaction</a>.
+      <p><a href="${nftUrl(id)}">See your NFT</a> or <a href="${CHAIN.explorer}/tx/${esc(hash)}">the transaction</a>.
       To see it in MetaMask, open the NFTs tab, choose Import NFT, and enter the contract address with token ID ${id}.</p>`;
     status("");
     $("rama").value = ""; onType();

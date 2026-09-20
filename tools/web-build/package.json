@@ -1,0 +1,12 @@
+{
+  "name": "web-build",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "esbuild": "0.28.2",
+    "viem": "2.56.8"
+  },
+  "scripts": {
+    "build": "esbuild entry.js --bundle --format=esm --platform=browser --minify --target=es2022 --outfile=../../web/vendor/viem.js"
+  }
+}

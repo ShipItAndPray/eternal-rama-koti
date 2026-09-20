@@ -6,7 +6,7 @@ import {Helpers} from "./Helpers.sol";
 
 contract MetadataTest is Test {
     EternalRamaKoti k; address a = address(0xA11CE);
-    function setUp() public { k = Helpers.deployKoti(); vm.prank(a); k.write(unicode"శ్రీరామ", "Srinivasa Somepalli"); }
+    function setUp() public { k = Helpers.deployKoti(); vm.prank(a, a); k.write(unicode"శ్రీరామ", "Srinivasa Somepalli"); }
 
     function _decode(string memory uri, string memory prefix) internal returns (string memory) {
         bytes memory u = bytes(uri); bytes memory p = bytes(prefix);
@@ -42,13 +42,13 @@ contract MetadataTest is Test {
         assertTrue(bytes(vm.parseJsonString(j, ".image")).length > 30);
     }
     function test_englishFormCarriesTradition() public {
-        vm.roll(block.number + 1); vm.prank(a); uint256 id = k.write("Sri Rama Jayam", "Meena");
+        vm.roll(block.number + 1); vm.prank(a, a); uint256 id = k.write("Sri Rama Jayam", "Meena");
         string memory j = _decode(k.tokenURI(id), "data:application/json;base64,");
         assertEq(vm.parseJsonString(j, ".name"), "Sri Rama Jayam #2");
         assertEq(vm.parseJsonString(j, ".attributes[0].value"), "English");
         assertEq(vm.parseJsonString(j, ".attributes[1].value"), "Tamil");
     }
     function test_everyLanguageRenders() public {
-        for (uint8 i = 0; i < k.LANG_COUNT(); i++) { vm.roll(block.number + 1); vm.prank(a); uint256 id = k.write(k.forms(i), "Nn"); k.tokenURI(id); }
+        for (uint8 i = 0; i < k.LANG_COUNT(); i++) { string memory f = k.forms(i); vm.roll(block.number + 1); vm.prank(a, a); uint256 id = k.write(f, "Nn"); k.tokenURI(id); }
     }
 }

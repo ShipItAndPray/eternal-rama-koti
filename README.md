@@ -71,8 +71,13 @@ that day, one name would cost about two cents. On Sepolia it costs nothing real.
 What the contract enforces, with no owner and no moderator:
 
 - The Rama word must match one of the six forms byte for byte.
-- One name per address per block. A contract cannot loop `write()` and a batching
-  wallet cannot mint many names in one transaction.
+- Only a wallet address can write, never a contract (`msg.sender == tx.origin`). A
+  factory cannot spawn throwaway contracts to mint many names in one transaction.
+  Smart-contract wallets such as Safe cannot write; EIP-7702 wallets can.
+- One name per address per block, so a batching wallet cannot mint many names in one
+  transaction either.
+- The constructor rejects any glyph address that is not a STOP-prefixed data contract,
+  and `glyphs(i)` lets anyone check which contracts the images come from.
 - Names are English letters with single separators, at least two letters, so "K. Srinivas"
   passes and "...", "- - -", or "a" do not.
 - Nothing can be edited or removed once written. The book closes at one crore.
@@ -89,6 +94,9 @@ real gas on mainnet, one transaction per name.
   form is a glyph outline and never depends on fonts.
 - Public RPCs can rate-limit. The page lists three per chain. The contract address is
   above so anyone can read the chain by other means.
+- The page loads no script from a CDN: viem is bundled into the repo at a pinned
+  version and a Content Security Policy is set. The one third-party script is the
+  analytics tag; if that worries you, the contract works without the page at all.
 
 ## Build
 
