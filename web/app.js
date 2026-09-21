@@ -289,9 +289,18 @@ async function refreshCounts() {
   updateOffer();
 }
 function entryRow(e, inkin) {
-  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><a class="idx" href="${nftUrl(e.id)}">${indian(e.id)}, ${ago(e.timestamp)}</a></li>`;
+  const link = openseaUrl(e.id) || nftUrl(e.id);
+  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><a class="idx" href="${link}" title="${openseaUrl(e.id) ? "See this NFT on OpenSea" : "See this NFT on Blockscout"}">${indian(e.id)}, ${ago(e.timestamp)}</a></li>`;
+}
+function showLatest(e) {
+  const el = $("latest");
+  const os = openseaUrl(e.id);
+  el.innerHTML = `Latest: ${glyph(e.lang, 16, true)} by ${esc(e.name)}, entry ${indian(e.id)}. ` +
+    (os ? `<a href="${os}">On OpenSea</a> or <a href="${nftUrl(e.id)}">Blockscout</a>.` : `<a href="${nftUrl(e.id)}">See it</a>.`);
+  el.hidden = false;
 }
 function prependEntry(e, inkin) {
+  showLatest(e);
   const ol = $("recent");
   ol.querySelector(".empty")?.remove();
   ol.insertAdjacentHTML("afterbegin", entryRow(e, inkin));
@@ -328,7 +337,9 @@ async function loadRecent() {
     const ol = $("recent");
     if (last.length === 0) { ol.innerHTML = `<li class="empty">Nothing written yet. The first line is yours.</li>`; return; }
     const entries = await Promise.all(last.map((l) => pub.readContract({ address: CHAIN.koti, abi: ABI, functionName: "entry", args: [l.args.id] })));
-    ol.innerHTML = entries.map((e, i) => entryRow({ id: last[i].args.id, lang: e[1], name: e[3], timestamp: e[2] }, false)).join("");
+    const rows = entries.map((e, i) => ({ id: last[i].args.id, lang: e[1], name: e[3], timestamp: e[2] }));
+    ol.innerHTML = rows.map((r) => entryRow(r, false)).join("");
+    if (rows.length) showLatest(rows[0]);
   } catch (e) {
     $("recent").innerHTML = `<li class="empty">Could not read recent entries right now.</li>`;
   }

@@ -73,6 +73,8 @@ section + section { margin-top: var(--line); }
 
 .tally { margin: 0; font-size: 27px; line-height: var(--line); }
 .tally-sub { margin: 0; color: var(--muted); }
+.latest .glyph { height: 16px; width: auto; vertical-align: -2px; }
+.latest .glyph path { fill: var(--ink); }
 .progress { height: 4px; margin: 6px 0 22px; background: rgba(31, 42, 68, .12); overflow: hidden; }
 .progress span { display: block; height: 100%; width: 0; background: var(--ink); transition: width .6s ease; }
 
