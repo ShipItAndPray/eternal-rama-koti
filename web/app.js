@@ -81,6 +81,7 @@ function b64json(uri) { // data:application/json;base64,... → object, UTF-8 sa
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 function nftUrl(id) { return `${CHAIN.blockscout}/token/${CHAIN.koti}/instance/${id}`; }
+function openseaUrl(id) { return CHAIN.opensea ? `${CHAIN.opensea}/${CHAIN.koti}/${id}` : null; }
 function status(msg, bad = false) { const el = $("status"); el.textContent = msg; el.style.color = bad ? "var(--ink)" : ""; }
 
 // ---------- language picker ----------
@@ -255,7 +256,7 @@ async function offer() {
     r.hidden = false;
     r.innerHTML = `<img src="${meta.image}" alt="${esc(meta.name)}, written by ${esc(name)}">
       <p>Written. Entry ${indian(id)}. You have written ${indian(mine)} ${mine === 1n ? "name" : "names"}.</p>
-      <p><a href="${nftUrl(id)}">See your NFT</a> or <a href="${CHAIN.explorer}/tx/${esc(hash)}">the transaction</a>.
+      <p>${openseaUrl(id) ? `<a href="${openseaUrl(id)}">See your NFT on OpenSea</a>, ` : ""}<a href="${nftUrl(id)}">on Blockscout</a>, or <a href="${CHAIN.explorer}/tx/${esc(hash)}">the transaction</a>.
       To see it in MetaMask, open the NFTs tab, choose Import NFT, and enter the contract address with token ID ${id}.</p>`;
     status("");
     $("rama").value = ""; onType();
@@ -369,6 +370,7 @@ onName();
 if (CHAIN.koti) {
   $("contract-link").href = `${CHAIN.explorer}/address/${CHAIN.koti}`;
   $("collection-link").href = `${CHAIN.blockscout}/token/${CHAIN.koti}`;
+  if (CHAIN.openseaCollection) { $("opensea-link").href = CHAIN.openseaCollection; $("opensea-link").hidden = false; }
   refreshCounts(); loadRecent(); refreshCost();
   setInterval(refreshCounts, 20000);
 } else {

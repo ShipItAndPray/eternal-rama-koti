@@ -11,6 +11,8 @@ export const CHAIN = {
   ],
   explorer: "https://etherscan.io",
   blockscout: "https://eth.blockscout.com",   // renders on-chain NFT images
+  opensea: "https://opensea.io/assets/ethereum",      // per-token pages; collection at opensea.io/collection/eternal-rama-koti
+  openseaCollection: "https://opensea.io/collection/eternal-rama-koti",
   koti: "0x664ddc51552c5ccb142443d0116bb7b24e9fda92",
   deployBlock: 26022509,
   // Optional: an address that belongs to the builder alone. Leave null to hide the support section.
