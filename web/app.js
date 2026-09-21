@@ -277,6 +277,7 @@ async function refreshCounts() {
   );
   $("count").textContent = indian(count);
   $("writers").textContent = indian(writers);
+  $("writers-word").textContent = writers === 1n ? "person has" : "people have";
   state.nextIndex = count + 1n;
   renderCard();
   state.full = count >= KOTI;
