@@ -80,7 +80,7 @@ function b64json(uri) { // data:application/json;base64,... → object, UTF-8 sa
   const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
   return JSON.parse(new TextDecoder().decode(bytes));
 }
-function nftUrl(id) { return `${CHAIN.blockscout}/token/${CHAIN.koti}/instance/${id}`; }
+function nftUrl(id) { return `${CHAIN.explorer}/nft/${CHAIN.koti}/${id}`; } // explorer fallback when OpenSea is unavailable
 function openseaUrl(id) { return CHAIN.opensea ? `${CHAIN.opensea}/${CHAIN.koti}/${id}` : null; }
 function status(msg, bad = false) { const el = $("status"); el.textContent = msg; el.style.color = bad ? "var(--ink)" : ""; }
 
@@ -256,7 +256,7 @@ async function offer() {
     r.hidden = false;
     r.innerHTML = `<img src="${meta.image}" alt="${esc(meta.name)}, written by ${esc(name)}">
       <p>Written. Entry ${indian(id)}. You have written ${indian(mine)} ${mine === 1n ? "name" : "names"}.</p>
-      <p>${openseaUrl(id) ? `<a href="${openseaUrl(id)}">See your NFT on OpenSea</a>, ` : ""}<a href="${nftUrl(id)}">on Blockscout</a>, or <a href="${CHAIN.explorer}/tx/${esc(hash)}">the transaction</a>.
+      <p><a href="${openseaUrl(id) || nftUrl(id)}">See your NFT${openseaUrl(id) ? " on OpenSea" : ""}</a> or <a href="${CHAIN.explorer}/tx/${esc(hash)}">the transaction</a>.
       To see it in MetaMask, open the NFTs tab, choose Import NFT, and enter the contract address with token ID ${id}.</p>`;
     status("");
     $("rama").value = ""; onType();
@@ -290,13 +290,12 @@ async function refreshCounts() {
 }
 function entryRow(e, inkin) {
   const link = openseaUrl(e.id) || nftUrl(e.id);
-  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><a class="idx" href="${link}" title="${openseaUrl(e.id) ? "See this NFT on OpenSea" : "See this NFT on Blockscout"}">${indian(e.id)}, ${ago(e.timestamp)}</a></li>`;
+  return `<li class="${inkin ? "inkin" : ""}">${glyph(e.lang, 18, true)}<span class="who">${esc(e.name)}</span><a class="idx" href="${link}" title="${openseaUrl(e.id) ? "See this NFT on OpenSea" : "See this NFT"}">${indian(e.id)}, ${ago(e.timestamp)}</a></li>`;
 }
 function showLatest(e) {
   const el = $("latest");
   const os = openseaUrl(e.id);
-  el.innerHTML = `Latest: ${glyph(e.lang, 16, true)} by ${esc(e.name)}, entry ${indian(e.id)}. ` +
-    (os ? `<a href="${os}">On OpenSea</a> or <a href="${nftUrl(e.id)}">Blockscout</a>.` : `<a href="${nftUrl(e.id)}">See it</a>.`);
+  el.innerHTML = `Latest: ${glyph(e.lang, 16, true)} by ${esc(e.name)}, entry ${indian(e.id)}. <a href="${os || nftUrl(e.id)}">${os ? "See it on OpenSea" : "See it"}</a>.`;
   el.hidden = false;
 }
 function prependEntry(e, inkin) {
@@ -380,7 +379,6 @@ $("invocation").innerHTML = [0, 1, 2].map((i) => glyph(i, 26, true)).join("");
 onName();
 if (CHAIN.koti) {
   $("contract-link").href = `${CHAIN.explorer}/address/${CHAIN.koti}`;
-  $("collection-link").href = `${CHAIN.blockscout}/token/${CHAIN.koti}`;
   if (CHAIN.openseaCollection) { $("opensea-link").href = CHAIN.openseaCollection; $("opensea-link").hidden = false; }
   refreshCounts(); loadRecent(); refreshCost();
   setInterval(refreshCounts, 20000);
@@ -390,5 +388,4 @@ if (CHAIN.koti) {
   $("cost").textContent = "The book is not open yet. The contract has not been deployed.";
   $("recent").innerHTML = `<li class="empty">The book opens when the contract is deployed.</li>`;
   $("contract-link").removeAttribute("href");
-  $("collection-link").removeAttribute("href");
 }
