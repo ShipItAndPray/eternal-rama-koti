@@ -156,7 +156,7 @@ contract EternalRamaKoti {
             "<svg x=\"50\" y=\"200\" width=\"500\" height=\"200\" viewBox=\"0 0 1000 400\"><path d=\"", string(DataStore.get(_glyphs[0])), "\" fill=\"#9B1C1C\"/></svg></svg>"
         );
         string memory j = string.concat(
-            "{\"name\":\"Eternal Rama Koti\",\"description\":\"A shared Rama Koti on Ethereum. One transaction writes one name of Rama. ",
+            "{\"name\":\"Eternal Rama Koti\",\"description\":\"Rama Koti, Sri Rama Jayam, and Ram Naam Lekhan, written on Ethereum. One transaction writes one name of Rama and mints it to the writer. ",
             Renderer.indian(count), " written so far.\",\"image\":\"data:image/svg+xml;base64,", Base64.encode(bytes(svg)), "\"}"
         );
         return string.concat("data:application/json;base64,", Base64.encode(bytes(j)));
