@@ -338,10 +338,11 @@ function renderDonate() {
   const to = CHAIN.donateTo;
   if (!to || !/^0x[0-9a-fA-F]{40}$/.test(to)) return;
   const sec = $("donate"); sec.hidden = false;
+  $("donate-link").hidden = false;
   const row = $("donate-row");
   row.innerHTML = `<code class="addr" id="donate-addr">${esc(to)}</code>
     <button type="button" class="wallet" id="donate-copy">Copy address</button>
-    ${[0.002, 0.01, 0.05].map((v) => `<button type="button" class="wallet" data-eth="${v}">Send ${v} ETH</button>`).join("")}`;
+    ${[0.002, 0.01, 0.05].map((v) => `<button type="button" class="wallet" data-eth="${v}">Donate ${v} ETH</button>`).join("")}`;
   $("donate-copy").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(to); $("donate-status").textContent = "Address copied."; }
     catch { $("donate-status").textContent = "Select the address and copy it."; }

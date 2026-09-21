@@ -24,6 +24,9 @@ a { color: inherit; }
 
 .cover { color: var(--gold); max-width: 760px; margin: 0 auto; padding: 44px 20px 20px; }
 .cover h1 { font-weight: 400; font-size: 46px; line-height: 1.1; margin: 0 0 10px; }
+.cover-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.donate-btn { flex: none; margin-top: 8px; font: inherit; font-size: 17px; color: var(--gold); border: 1.5px solid var(--gold); border-radius: 6px; padding: 8px 18px; text-decoration: none; }
+.donate-btn:hover, .donate-btn:focus-visible { background: rgba(232, 201, 138, .12); }
 .cover-line { margin: 0; font-style: italic; font-size: 21px; opacity: .92; }
 .foot { padding: 28px 20px 56px; font-size: 16px; line-height: 26px; opacity: .85; }
 .about { padding: 36px 20px 8px; }

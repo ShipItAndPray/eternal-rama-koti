@@ -14,7 +14,7 @@ export const CHAIN = {
   koti: "0x664ddc51552c5ccb142443d0116bb7b24e9fda92",
   deployBlock: 26022509,
   // Optional: an address that belongs to the builder alone. Leave null to hide the support section.
-  donateTo: null,
+  donateTo: "0x05730606C0279cC6fC4a2419425861b85f3b8054",
 };
 
 // Sepolia test deployment, kept for reference:
