@@ -26,6 +26,9 @@ a { color: inherit; }
 .cover h1 { font-weight: 400; font-size: 46px; line-height: 1.1; margin: 0 0 10px; }
 .cover-line { margin: 0; font-style: italic; font-size: 21px; opacity: .92; }
 .foot { padding: 28px 20px 56px; font-size: 16px; line-height: 26px; opacity: .85; }
+.about { padding: 36px 20px 8px; }
+.about h2 { color: var(--gold); font-size: 26px; margin: 0 0 8px; }
+.about p { margin: 0; font-size: 17px; line-height: 28px; opacity: .92; }
 .foot p { margin: 0 0 10px; }
 .sep { opacity: .7; }
 
