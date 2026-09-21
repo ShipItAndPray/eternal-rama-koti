@@ -335,6 +335,7 @@ async function loadRecent() {
 // ---------- boot ----------
 renderLangs();
 selectForm(0);
+$("invocation").innerHTML = [0, 1, 2].map((i) => glyph(i, 26, true)).join("");
 onName();
 if (CHAIN.koti) {
   $("contract-link").href = `${CHAIN.explorer}/address/${CHAIN.koti}`;
