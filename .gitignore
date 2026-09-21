@@ -5,3 +5,4 @@ broadcast/
 .venv/
 tools/fonts/*.ttf
 node_modules/
+foundry-pp/

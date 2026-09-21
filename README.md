@@ -2,7 +2,7 @@
 
 **One transaction writes one name of Rama on Ethereum. Forever.**
 
-Live page: https://shipitandpray.github.io/eternal-rama-koti/ (Sepolia test network)
+Live page: https://shipitandpray.github.io/eternal-rama-koti/ (Ethereum mainnet)
 
 A shared Rama Koti. A devotee picks a language, types the name of Rama in that script,
 adds their own name, and sends one transaction. The contract checks the typed bytes
@@ -37,17 +37,18 @@ The contract accepts exactly these byte sequences and nothing else.
 
 | Network | Contract | Deployed |
 |---|---|---|
+| **Ethereum mainnet** | [`0x664ddc51552c5ccb142443d0116bb7b24e9fda92`](https://etherscan.io/address/0x664ddc51552c5ccb142443d0116bb7b24e9fda92) | 2026-09-21, block 26022509 |
 | Sepolia | [`0x1d47d28174a6c0d2876415894da9ddd6c4f7a952`](https://sepolia.etherscan.io/address/0x1d47d28174a6c0d2876415894da9ddd6c4f7a952) | 2026-09-20, block 11746594 (v3 after the security review; v1 `0x3d23…02ef` and v2 `0x32e2…356e` are retired) |
 
-Mainnet is a separate decision, not yet made.
+The mainnet book is the real one. Sepolia deployments are for testing only.
 
 ## Write from any wallet, by hand
 
 The page is a convenience. The contract is the truth. From Foundry's `cast`:
 
 ```bash
-cast send 0x1d47d28174a6c0d2876415894da9ddd6c4f7a952 "write(string,string)" "శ్రీరామ" "Your Name" \
-  --rpc-url https://ethereum-sepolia-rpc.publicnode.com --private-key <key>
+cast send 0x664ddc51552c5ccb142443d0116bb7b24e9fda92 "write(string,string)" "శ్రీరామ" "Your Name" \
+  --rpc-url https://ethereum-rpc.publicnode.com --private-key <key>
 ```
 
 Or use the explorer's Write Contract tab with `write(rama, writerName)`. The name must be
@@ -56,15 +57,15 @@ Or use the explorer's Write Contract tab with `write(rama, writerName)`. The nam
 Read the book:
 
 ```bash
-cast call 0x1d47d28174a6c0d2876415894da9ddd6c4f7a952 "count()(uint256)" --rpc-url https://ethereum-sepolia-rpc.publicnode.com
-cast call 0x1d47d28174a6c0d2876415894da9ddd6c4f7a952 "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
+cast call 0x664ddc51552c5ccb142443d0116bb7b24e9fda92 "count()(uint256)" --rpc-url https://ethereum-rpc.publicnode.com
+cast call 0x664ddc51552c5ccb142443d0116bb7b24e9fda92 "tokenURI(uint256)(string)" 1 --rpc-url https://ethereum-rpc.publicnode.com
 ```
 
 ## Gas
 
 Measured with `forge snapshot` on 2026-09-20: a repeat write costs about 87,700 gas and
 an address's first write about 109,900 gas. At mainnet's 0.063 gwei and ETH at $2,624
-that day, one name would cost about two cents. On Sepolia it costs nothing real.
+that day, one name would cost about two cents. 
 
 ## Integrity
 

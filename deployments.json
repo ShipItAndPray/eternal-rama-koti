@@ -1,4 +1,18 @@
 {
+  "mainnet": {
+    "chainId": 1,
+    "koti": "0x664ddc51552c5ccb142443d0116bb7b24e9fda92",
+    "glyphs": [
+      "0x2e5a45b21a036c382eecf792a6b09b5a9126f1ec",
+      "0x03379b15bb6acc137e3783e93f6c4ad02e5920b7",
+      "0x550f90509a9ca87bbeabd6360e241b4c5dd910de",
+      "0x1eae411e6901eeeb4c7b296e7fc9d3973130a5b0",
+      "0x1a2e1b1f0d2b628ffcc430a149a7fedb10e6e613",
+      "0x3df957a644405fef2cf0ad3a0bae1b6c1fabdab2"
+    ],
+    "deployBlock": 26022509,
+    "deployTx": "0xd8af414c865784113252e4a9975b087950a19146dd89128855fba52ec357511f"
+  },
   "sepolia": {
     "chainId": 11155111,
     "koti": "0x1d47d28174a6c0d2876415894da9ddd6c4f7a952",
