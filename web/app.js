@@ -333,9 +333,36 @@ async function loadRecent() {
   }
 }
 
+// ---------- support the builder ----------
+function renderDonate() {
+  const to = CHAIN.donateTo;
+  if (!to || !/^0x[0-9a-fA-F]{40}$/.test(to)) return;
+  const sec = $("donate"); sec.hidden = false;
+  const row = $("donate-row");
+  row.innerHTML = `<code class="addr" id="donate-addr">${esc(to)}</code>
+    <button type="button" class="wallet" id="donate-copy">Copy address</button>
+    ${[0.002, 0.01, 0.05].map((v) => `<button type="button" class="wallet" data-eth="${v}">Send ${v} ETH</button>`).join("")}`;
+  $("donate-copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(to); $("donate-status").textContent = "Address copied."; }
+    catch { $("donate-status").textContent = "Select the address and copy it."; }
+  });
+  row.querySelectorAll("[data-eth]").forEach((b) => b.addEventListener("click", () => donate(to, b.dataset.eth)));
+}
+async function donate(to, eth) {
+  const st = $("donate-status");
+  if (!state.provider || !state.account) { st.textContent = "Connect a wallet above first, or copy the address and send from any wallet."; return; }
+  try {
+    const wallet = createWalletClient({ chain, transport: custom(state.provider) });
+    st.textContent = "Confirm in your wallet.";
+    const hash = await wallet.sendTransaction({ account: state.account, to, value: BigInt(Math.round(Number(eth) * 1e18)) });
+    st.innerHTML = `Thank you. <a href="${CHAIN.explorer}/tx/${esc(hash)}">See the transaction</a>.`;
+  } catch (e) { st.textContent = walletError(e); }
+}
+
 // ---------- boot ----------
 renderLangs();
 selectForm(0);
+renderDonate();
 $("invocation").innerHTML = [0, 1, 2].map((i) => glyph(i, 26, true)).join("");
 onName();
 if (CHAIN.koti) {

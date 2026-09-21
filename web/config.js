@@ -13,6 +13,8 @@ export const CHAIN = {
   blockscout: "https://eth.blockscout.com",   // renders on-chain NFT images
   koti: "0x664ddc51552c5ccb142443d0116bb7b24e9fda92",
   deployBlock: 26022509,
+  // Optional: an address that belongs to the builder alone. Leave null to hide the support section.
+  donateTo: null,
 };
 
 // Sepolia test deployment, kept for reference:

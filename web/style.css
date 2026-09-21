@@ -30,6 +30,10 @@ a { color: inherit; }
 .about h2 { color: var(--gold); font-size: 26px; margin: 0 0 8px; }
 .about p { margin: 0 0 14px; font-size: 17px; line-height: 28px; opacity: .92; max-width: 68ch; }
 .about strong { font-weight: 700; }
+.donate-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 6px 0 10px; }
+.addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; color: var(--gold); background: rgba(255,255,255,.06); padding: 6px 10px; border-radius: 6px; word-break: break-all; }
+.donate .wallet { height: 40px; font-size: 16px; }
+.donate .help { color: var(--gold); opacity: .85; }
 .invocation { display: flex; justify-content: center; align-items: center; gap: 36px; height: var(--line); margin-bottom: var(--line); }
 .invocation .glyph { height: 26px; width: auto; }
 .invocation .glyph path { fill: var(--ink); opacity: .85; }
